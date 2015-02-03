@@ -17,6 +17,7 @@ import socket
 import time
 import random
 import json
+import yaml
 
 import requests
 import testresources
@@ -184,6 +185,15 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
     def deploy_environment(self, environment, session):
         self.murano.sessions.deploy(environment.id, session.id)
         return self.wait_for_environment_deploy(environment)
+
+    def get_environment(self, environment):
+        return self.murano.environments.get(environment.id)
+
+    def get_service_as_json(self, environment):
+        service = self.murano.services.list(environment.id)[0]
+        service = service.to_dict()
+        service = json.dumps(service)
+        return yaml.load(service)
 
     def _quick_deploy(self, name, *apps):
         environment = self.murano.environments.create({'name': name})
