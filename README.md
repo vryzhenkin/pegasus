@@ -30,7 +30,7 @@ in sanity.
 
 # Recommendations
 
-Strongly recommended do not run this tests versus poor environments.
+Strongly recommended not to run this tests versus poor environments.
 Multiple starts at same time can cause your Heat component to malfunction.
 If you have one controller, you need be sure, that your Heat component works correctly and as fast as possible.
 
