@@ -15,8 +15,8 @@
 
 import uuid
 
-import murano.tests.functional.engine.config as cfg
-import murano.tests.functional.engine.muranomanager as core
+import config as cfg
+import muranomanager as core
 
 CONF = cfg.cfg.CONF
 
