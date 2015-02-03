@@ -19,8 +19,12 @@ Running single test from test-suite
 
     nosetests -sv test_deploy_docker.py:MuranoDockerTest.test_deploy_docker_redis
 
-For high priority advanced test cases you need to use test_deploy_docker_advanced.py
+For advanced test cases you need to use test_deploy_docker_advanced.py
 
     nosetests -sv test_deploy_docker_advanced.py
 
-Now, we still working under medium priority advanced test cases. ETA is 3.02.2015
+If you want to run single test from advanced cases, you need to do the same as
+in sanity.
+
+    nosetests -sv test_deploy_docker_advanced.py:MuranoDockerTestAdvanced.test_deploy_docker_mongodb_wait_deploy_nginx
+
