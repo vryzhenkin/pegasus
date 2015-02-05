@@ -28,6 +28,10 @@ in sanity.
 
     nosetests -sv test_deploy_docker_advanced.py:MuranoDockerTestAdvanced.test_deploy_docker_mongodb_wait_deploy_nginx
 
+For old-school applications testing run:
+
+    nosetests -sv test_deploy_old_school.py
+    
 # Recommendations
 
 Strongly recommended not to run this tests versus poor environments.
