@@ -27,6 +27,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         super(MuranoDockerTest, cls).setUpClass()
 
         cls.docker = CONF.murano.docker_image
+        cls.flavor = CONF.murano.standard_flavor
 
     def setUp(self):
         super(MuranoDockerTest, self).setUp()
@@ -48,7 +49,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -114,7 +115,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -158,7 +159,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -202,7 +203,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -249,7 +250,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -294,7 +295,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -339,7 +340,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -385,7 +386,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -429,7 +430,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -474,7 +475,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -519,7 +520,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -563,7 +564,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -608,7 +609,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -652,7 +653,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {
@@ -697,7 +698,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
-                "flavor": "m1.medium",
+                "flavor": self.flavor,
                 "image":
                     "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
                 "?": {

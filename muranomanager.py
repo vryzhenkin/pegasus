@@ -217,3 +217,11 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             if environment_id in stack.description:
                 return stack
 
+    def check_path(self, environment, path):
+        environment = environment.manager.get(environment.id)
+        ip = environment.services[0]['instance']['floatingIpAddress']
+        resp = requests.get('http://{0}/{1}'.format(ip, path))
+        if resp.status_code == 200:
+            pass
+        else:
+            self.fail("Service path unavailable")
