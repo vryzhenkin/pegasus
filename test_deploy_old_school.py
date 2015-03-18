@@ -43,12 +43,41 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             except Exception:
                 pass
 
+    def test_deploy_hdp(self):
+        post_body = {
+            "instance": {
+                "flavor": self.flavor,
+                "image":
+                    "hdp-sandbox",
+                "assignFloatingIp": True,
+                "?": {
+                    "type": "io.murano.resources.LinuxMuranoInstance",
+                    "id": str(uuid.uuid4())
+                },
+                "name": self.rand_name("testMurano_hdp")
+            },
+            "name": self.rand_name("test_HDP-Sandbox"),
+            "?": {
+                "_{id}".format(id=uuid.uuid4().hex): {
+                    "name": "hdp-sandbox"
+                },
+                "type": "io.murano.apps.HDPSandbox",
+                "id": str(uuid.uuid4())
+            }
+        }
+        environment = self.create_env()
+        session = self.create_session(environment)
+        self.create_service(environment, session, post_body)
+        self.deploy_environment(environment, session)
+        self.deployment_success_check(environment, 22, 8888)
+
+    # TODO: test fails when floating ip is assigned to both instances. Passes when assign it only to Apache instance.
     def test_deploy_apache_http_mysql_wordpress(self):
         post_body = {
             "instance": {
                 "flavor": self.flavor,
                 "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -73,7 +102,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             "instance": {
                 "flavor": self.flavor,
                 "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -120,7 +149,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             "instance": {
                 "flavor": self.flavor,
                 "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -151,7 +180,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             "instance": {
                 "flavor": self.flavor,
                 "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -182,7 +211,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             "instance": {
                 "flavor": self.flavor,
                 "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
