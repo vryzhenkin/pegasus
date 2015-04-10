@@ -50,8 +50,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -62,7 +61,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -71,12 +70,13 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'tutum/influxdb',
             "name": self.rand_name("Influx"),
-            "port": 8083,
-            "portAPI": 8086,
+            "interfacePort": 8083,
+            "apiPort": 8086,
             "preCreateDB": 'db1;db2',
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker InfluxDB"
@@ -85,11 +85,10 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "id": str(uuid.uuid4())
             }
         }
-
         self.influx_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'tutum/grafana',
             "name": self.rand_name("Grafana"),
             "port": 80,
@@ -97,6 +96,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "grafanaUser": self.rand_name("user"),
             "grafanaPassword": self.rand_name("pass"),
             "dbName": self.rand_name("base"),
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker Grafana"
@@ -107,7 +107,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025, 1026, 1027)
+        self.deployment_success_check(environment, 22, 8083, 8086, 80)
 
     def test_deploy_docker_mongodb(self):
         post_body = {
@@ -116,8 +116,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -128,7 +127,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -137,10 +136,11 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'mongo',
             "name": self.rand_name("Mongo"),
             "port": 27017,
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker MongoDB"
@@ -151,7 +151,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 27017)
 
     def test_deploy_docker_nginx(self):
         post_body = {
@@ -160,8 +160,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -172,7 +171,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -181,10 +180,11 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'nginx',
             "name": self.rand_name("Nginx"),
             "port": 80,
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker Nginx"
@@ -195,7 +195,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 80)
 
     def test_deploy_docker_glassfish(self):
         post_body = {
@@ -204,8 +204,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -216,7 +215,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -225,13 +224,14 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'tutum/glassfish',
             "name": self.rand_name("Glass"),
             "password": self.rand_name("O5t@"),
-            "portAdmin": 4848,
-            "portHTTP": 8080,
-            "portHTTPS": 8181,
+            "adminPort": 4848,
+            "httpPort": 8080,
+            "httpsPort": 8181,
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker GlassFish"
@@ -242,7 +242,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025, 1026, 1027)
+        self.deployment_success_check(environment, 22, 4848, 8080, 8181)
 
     def test_deploy_docker_mariadb(self):
         post_body = {
@@ -251,8 +251,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -263,7 +262,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -272,11 +271,12 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'tutum/mariadb',
             "name": self.rand_name("MariaDB"),
             "port": 3306,
             "password": self.rand_name("O5t@"),
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker MariaDB"
@@ -287,7 +287,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 3306)
 
     def test_deploy_docker_mysql(self):
         post_body = {
@@ -296,8 +296,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -308,7 +307,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -317,11 +316,12 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'mysql',
             "name": self.rand_name("MySQL"),
             "port": 3306,
             "password": self.rand_name("O5t@"),
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker MySQL"
@@ -332,17 +332,16 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 3306)
 
-    def test_deploy_docker_phpzendserver(self):
+    def test_deploy_docker_mysql_phpzendserver(self):
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -353,7 +352,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -361,13 +360,36 @@ class MuranoDockerTest(core.MuranoTestsCore):
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
+
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
+            "image": 'mysql',
+            "name": self.rand_name("MySQL"),
+            "port": 3306,
+            "password": self.rand_name("O5t@"),
+            "publish": True,
+            "?": {
+                "_{id}".format(id=uuid.uuid4().hex): {
+                    "name": "Docker MySQL"
+                },
+                "type": "io.murano.apps.docker.DockerMySQL",
+                "id": str(uuid.uuid4())
+            }
+        }
+        self.mysql = self.create_service(environment, session, post_body)
+
+        post_body = {
+            "host": self.docker_service,
             "image": 'php-zendserver',
             "name": self.rand_name("PHP-Zend"),
             "port": 80,
-            "portAdmin": 10081,
+            "adminPort": 10081,
             "password": self.rand_name("O5t@"),
+            "publish": True,
+            "database": self.mysql,
+            "dbName": self.rand_name(""),
+            "dbUser": self.rand_name("Us3@"),
+            "dbPass": self.rand_name("P@s5"),
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker PHP-ZendServer"
@@ -378,7 +400,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025, 1026)
+        self.deployment_success_check(environment, 22, 3306, 80, 10081)
 
     def test_deploy_docker_jenkins(self):
         post_body = {
@@ -387,8 +409,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -399,7 +420,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -408,10 +429,11 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'jenkins',
             "name": self.rand_name("Jenkins"),
             "port": 8080,
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker Jenkins"
@@ -422,7 +444,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 8080)
 
     def test_deploy_docker_postgres(self):
         post_body = {
@@ -431,8 +453,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -443,7 +464,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -452,22 +473,23 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'postgres',
             "name": self.rand_name("Postgres"),
             "port": 5432,
             "password": self.rand_name("O5t@"),
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker PostgreSQL"
                 },
-                "type": "io.murano.apps.docker.DockerPostgres",
+                "type": "io.murano.apps.docker.DockerPostgreSQL",
                 "id": str(uuid.uuid4())
             }
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 5432)
 
     def test_deploy_docker_crate(self):
         post_body = {
@@ -476,8 +498,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -488,7 +509,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -497,11 +518,12 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'crate',
             "name": self.rand_name("Crate"),
-            "port4200": 4200,
-            "port4300": 4300,
+            "interfacePort": 4200,
+            "transportPort": 4300,
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker Crate"
@@ -512,7 +534,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025, 1026)
+        self.deployment_success_check(environment, 22, 4200, 4300)
 
     def test_deploy_docker_redis(self):
         post_body = {
@@ -521,8 +543,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -533,7 +554,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -542,10 +563,11 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'redis',
             "name": self.rand_name("Redis"),
             "port": 6379,
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker Redis"
@@ -556,7 +578,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 6379)
 
     def test_deploy_docker_tomcat(self):
         post_body = {
@@ -565,8 +587,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -577,7 +598,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -586,11 +607,12 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'tutum/tomcat',
             "name": self.rand_name("Tomcat"),
             "port": 8080,
             "password": self.rand_name("O5t@"),
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker Tomcat"
@@ -601,7 +623,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 8080)
 
     def test_deploy_docker_httpd(self):
         post_body = {
@@ -610,8 +632,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -622,7 +643,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -631,10 +652,11 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'httpd',
             "name": self.rand_name("HTTPd"),
             "port": 80,
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker HTTPd"
@@ -645,7 +667,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 80)
 
     def test_deploy_docker_nginx_site(self):
         post_body = {
@@ -654,8 +676,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -666,7 +687,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -675,11 +696,12 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'nginx',
             "name": self.rand_name("NginxS"),
             "port": 80,
-            "url": 'http://github.com/???',
+            "siteRepo": 'https://github.com/gabrielecirulli/2048.git',
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker Nginx Site"
@@ -690,8 +712,9 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 80)
 
+    """
     def test_deploy_docker_container(self):
         post_body = {
             "instance": {
@@ -699,8 +722,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -711,7 +733,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -720,10 +742,11 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.docker_service = self.create_service(environment, session,
                                                   post_body)
         post_body = {
-            "docker": self.docker_service,
+            "host": self.docker_service,
             "image": 'tutum/elasticsearch',
             "name": self.rand_name("Esearch"),
             "ports": "9200",
+            "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker Elastic Search"
@@ -734,4 +757,5 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 9200)
+        """

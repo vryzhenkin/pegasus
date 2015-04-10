@@ -28,6 +28,8 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
 
         cls.docker = CONF.murano.docker_image
         cls.flavor = CONF.murano.standard_flavor
+        cls.linux = CONF.murano.linux_image
+        cls.hdp_image = CONF.murano.hdp_image
 
     def setUp(self):
         super(MuranoOldSchoolTest, self).setUp()
@@ -43,6 +45,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             except Exception:
                 pass
 
+    """
     def test_deploy_hdp(self):
         post_body = {
             "instance": {
@@ -70,14 +73,13 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
         self.deployment_success_check(environment, 22, 8888)
-
+    """
     # TODO: test fails when floating ip is assigned to both instances. Passes when assign it only to Apache instance.
     def test_deploy_apache_http_mysql_wordpress(self):
         post_body = {
             "instance": {
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
+                "image": self.linux,
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -101,8 +103,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         post_body = {
             "instance": {
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
+                "image": self.linux,
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -148,8 +149,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         post_body = {
             "instance": {
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
+                "image": self.linux,
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -179,8 +179,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         post_body = {
             "instance": {
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
+                "image": self.linux,
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -210,8 +209,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         post_body = {
             "instance": {
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu 14.04 LTS x64 (pre installed murano agent)",
+                "image": self.linux,
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -245,8 +243,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
                 "assignFloatingIp": True,
                 "keyname": "",
                 "flavor": self.flavor,
-                "image":
-                    "Ubuntu14.04 x64 (pre-installed murano agent and docker)",
+                "image": self.docker,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -257,7 +254,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker VM Service"
                 },
-                "type": "io.murano.apps.docker.DockerSingleVMServer50",
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
                 "id": str(uuid.uuid4())
             }
         }
@@ -265,4 +262,4 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         session = self.create_session(environment)
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 2375)
+        self.deployment_success_check(environment, 22)

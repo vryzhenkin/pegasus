@@ -45,11 +45,14 @@ MuranoGroup = [
                default='default_linux',
                help="image for linux services"),
     cfg.StrOpt('docker_image',
-               default='default_docker',
+               default='ubuntu14.04-x64-docker',
                help="image for docker applications"),
     cfg.StrOpt('windows_image',
                default='default_windows',
-               help="image for windows services")
+               help="image for windows services"),
+    cfg.StrOpt('hdp_image',
+               default="hdp-sandbox",
+               help="image for hdp-sandbox")
 ]
 
 
