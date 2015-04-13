@@ -669,6 +669,51 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deploy_environment(environment, session)
         self.deployment_success_check(environment, 22, 80)
 
+    def test_deploy_docker_httpd_site(self):
+        post_body = {
+            "instance": {
+                "name": self.rand_name("Docker"),
+                "assignFloatingIp": True,
+                "keyname": "",
+                "flavor": self.flavor,
+                "image": self.docker,
+                "?": {
+                    "type": "io.murano.resources.LinuxMuranoInstance",
+                    "id": str(uuid.uuid4())
+                },
+            },
+            "name": "DockerVM",
+            "?": {
+                "_{id}".format(id=uuid.uuid4().hex): {
+                    "name": "Docker VM Service"
+                },
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
+                "id": str(uuid.uuid4())
+            }
+        }
+        environment = self.create_env()
+        session = self.create_session(environment)
+        self.docker_service = self.create_service(environment, session,
+                                                  post_body)
+        post_body = {
+            "host": self.docker_service,
+            "image": 'httpd',
+            "name": self.rand_name("HTTPd"),
+            "port": 80,
+            "publish": True,
+            "siteRepo": "https://github.com/gabrielecirulli/2048.git",
+            "?": {
+                "_{id}".format(id=uuid.uuid4().hex): {
+                    "name": "Docker HTTPd"
+                },
+                "type": "io.murano.apps.docker.DockerHTTPd",
+                "id": str(uuid.uuid4())
+            }
+        }
+        self.create_service(environment, session, post_body)
+        self.deploy_environment(environment, session)
+        self.deployment_success_check(environment, 22, 80)
+
     def test_deploy_docker_nginx_site(self):
         post_body = {
             "instance": {
