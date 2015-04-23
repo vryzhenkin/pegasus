@@ -48,7 +48,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -114,7 +114,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -137,9 +137,9 @@ class MuranoDockerTest(core.MuranoTestsCore):
                                                   post_body)
         post_body = {
             "host": self.docker_service,
-            "image": 'mongo',
+            #"image": 'mongo',
             "name": self.rand_name("Mongo"),
-            "port": 27017,
+            #"port": 27017,
             "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
@@ -158,7 +158,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -202,7 +202,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -249,7 +249,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -294,7 +294,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -339,7 +339,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -407,7 +407,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -451,7 +451,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -496,7 +496,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -519,10 +519,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                                                   post_body)
         post_body = {
             "host": self.docker_service,
-            "image": 'crate',
             "name": self.rand_name("Crate"),
-            "interfacePort": 4200,
-            "transportPort": 4300,
             "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
@@ -541,7 +538,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -585,7 +582,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -630,7 +627,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -674,7 +671,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -719,7 +716,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -759,13 +756,12 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deploy_environment(environment, session)
         self.deployment_success_check(environment, 22, 80)
 
-    """
     def test_deploy_docker_container(self):
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -803,4 +799,3 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
         self.deployment_success_check(environment, 22, 9200)
-        """

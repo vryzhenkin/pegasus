@@ -76,45 +76,25 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
     """
     # TODO: test fails when floating ip is assigned to both instances. Passes when assign it only to Apache instance.
     def test_deploy_apache_http_mysql_wordpress(self):
-        post_body = {
-            "instance": {
-                "flavor": self.flavor,
-                "image": self.linux,
-                "assignFloatingIp": True,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-                "name": self.rand_name("testMurano")
-            },
-            "name": self.rand_name("teMurano"),
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Apache"
-                },
-                "type": "io.murano.apps.apache.ApacheHttpServer",
-                "id": str(uuid.uuid4())
-            }
-        }
         environment = self.create_env()
         session = self.create_session(environment)
-        self.apache = self.create_service(environment, session, post_body)
 
         post_body = {
             "instance": {
                 "flavor": self.flavor,
                 "image": self.linux,
                 "assignFloatingIp": True,
+                "keyname": self.keyname,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
                 },
                 "name": self.rand_name("testMurano")
             },
-            "database": self.rand_name('db'),
-            "username": self.rand_name('user'),
-            "password": self.rand_name('P@s5'),
-            "name": self.rand_name("teMurano"),
+            "database": "newbaseapp",
+            "username": "newuser",
+            "password": "n3wp@sSwd",
+            "name": self.rand_name("MySQL"),
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "MySQL"
@@ -126,11 +106,34 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         self.mysql = self.create_service(environment, session, post_body)
 
         post_body = {
+            "instance": {
+                "flavor": self.flavor,
+                "image": self.linux,
+                "assignFloatingIp": True,
+                "keyname": self.keyname,
+                "?": {
+                    "type": "io.murano.resources.LinuxMuranoInstance",
+                    "id": str(uuid.uuid4())
+                },
+                "name": self.rand_name("testMurano")
+            },
+            "name": self.rand_name("Apache"),
+            "?": {
+                "_{id}".format(id=uuid.uuid4().hex): {
+                    "name": "Apache"
+                },
+                "type": "io.murano.apps.apache.ApacheHttpServer",
+                "id": str(uuid.uuid4())
+            }
+        }
+        self.apache = self.create_service(environment, session, post_body)
+
+        post_body = {
             "name": self.rand_name('WP'),
             "server": self.apache,
             "database": self.mysql,
-            "dbName": self.rand_name('wp'),
-            "dbUser": self.rand_name('wpuser'),
+            "dbName": "wordpress",
+            "dbUser": "wp_user",
             "dbPassword": self.rand_name('P@s5'),
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
@@ -141,15 +144,20 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             }
         }
         self.create_service(environment, session, post_body)
+
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 80)
-        self.check_path(environment, "wordpress")
+        self.status_check(environment,
+                          [self.apache['instance']['name'], 22, 80],
+                          [self.mysql['instance']['name'], 22, 3306])
+        self.check_path(environment, "wordpress",
+                        self.apache['instance']['name'])
 
     def test_deploy_postgres(self):
         post_body = {
             "instance": {
                 "flavor": self.flavor,
                 "image": self.linux,
+                "keyname": self.keyname,
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -180,6 +188,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             "instance": {
                 "flavor": self.flavor,
                 "image": self.linux,
+                "keyname": self.keyname,
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -210,6 +219,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             "instance": {
                 "flavor": self.flavor,
                 "image": self.linux,
+                "keyname": self.keyname,
                 "assignFloatingIp": True,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
@@ -241,7 +251,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {

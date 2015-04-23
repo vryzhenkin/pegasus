@@ -48,7 +48,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -130,7 +130,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -208,7 +208,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -287,7 +287,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -362,7 +362,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "host": self.docker_service,
             "image": 'php-zendserver',
             "name": self.rand_name("PHP-Zend"),
-            "port": 81,
+            "port": 80,
             "adminPort": 10081,
             "password": self.rand_name("O5t@"),
             "publish": True,
@@ -381,14 +381,14 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
         self.deployment_success_check(environment, 22, 8080, 80, 3306,
-                                      81, 10081)
+                                      1025, 10081)
 
     def test_deploy_docker_redis_tomcat_influxdb(self):
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -468,7 +468,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -547,7 +547,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -584,7 +584,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 1025)
+        self.deployment_success_check(environment, 22, 80)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
         self.docker_service = self.get_service_as_json(environment)
@@ -593,7 +593,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "host": self.docker_service,
             "image": 'httpd',
             "name": self.rand_name("HTTPd"),
-            "port": 81,
+            "port": 80,
             "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
@@ -605,14 +605,14 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 80, 81)
+        self.deployment_success_check(environment, 22, 80, 1025)
 
     def test_deploy_docker_mysql_wait_deploy_tomcat(self):
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -679,7 +679,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -743,7 +743,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "host": self.docker_service,
             "image": 'php-zendserver',
             "name": self.rand_name("PHP-Zend"),
-            "port": 81,
+            "port": 80,
             "adminPort": 10081,
             "password": self.rand_name("O5t@"),
             "publish": True,
@@ -761,14 +761,14 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 80, 3306, 81, 10081)
+        self.deployment_success_check(environment, 22, 80, 3306, 1025, 10081)
 
     def test_deploy_docker_tomcat_wait_deploy_mariadb(self):
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -835,7 +835,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -884,7 +884,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "host": self.docker_service,
             "image": 'jenkins',
             "name": self.rand_name("Jenkins"),
-            "port": 8081,
+            "port": 8080,
             "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
@@ -896,14 +896,14 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 4848, 8080, 8181, 8081)
+        self.deployment_success_check(environment, 22, 4848, 8080, 8181, 1025)
 
     def test_deploy_docker_nginx_wait_deploy_crate(self):
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -970,7 +970,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {
@@ -1039,7 +1039,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
             "instance": {
                 "name": self.rand_name("Docker"),
                 "assignFloatingIp": True,
-                "keyname": "",
+                "keyname": self.keyname,
                 "flavor": self.flavor,
                 "image": self.docker,
                 "?": {

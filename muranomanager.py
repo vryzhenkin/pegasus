@@ -53,6 +53,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         cls.heat_url = cls.keystone.service_catalog.url_for(
             service_type='orchestration', endpoint_type='publicURL')
         cls.murano_endpoint = cls.murano_url + '/v1/'
+        cls.keyname = CONF.murano.keyname
 
     @classmethod
     def upload_package(cls, package_name, body, app, ):
@@ -80,6 +81,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         for env in self.environments:
             try:
                 self.environment_delete(env)
+                time.sleep(60)
             except Exception:
                 pass
 
@@ -105,9 +107,12 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         while status != 'ready':
             status = environment.manager.get(environment.id).status
             if time.time() - start_time > 1800:
+                time.sleep(60)
                 self.fail(
                     'Environment deployment is not finished in 1200 seconds')
             elif status == 'deploy failure':
+                print()
+                time.sleep(60)
                 self.fail('Environment has incorrect status {0}'.format(status))
             time.sleep(5)
 
@@ -128,6 +133,11 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         self.assertEqual(0, result, '%s port is closed on instance' % port)
 
     def deployment_success_check(self, environment, *ports):
+        """
+
+        :param environment:
+        :param ports:
+        """
         deployment = self.murano.deployments.list(environment.id)[-1]
 
         self.assertEqual('success', deployment.state,
@@ -140,6 +150,27 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 self.check_port_access(ip, port)
         else:
             self.fail('Instance does not have floating IP')
+
+    def status_check(self, environment, *configurations):
+        for configuration in configurations:
+            name = configuration[0]
+            ports = configuration[1:]
+            ip = self.get_ip_by_instance_name(environment, name)
+            if ip and ports:
+                for port in ports:
+                    self.check_port_access(ip, port)
+            else:
+                self.fail('Instance does not have floating IP')
+
+    def get_ip_by_appname(self, environment, appname):
+        for service in environment.services:
+            if appname in service['name']:
+                return service['instance']['floatingIpAddress']
+
+    def get_ip_by_instance_name(self, environment, name):
+        for service in environment.services:
+            if name in service['instance']['name']:
+                return service['instance']['floatingIpAddress']
 
     def create_env(self):
         name = self.rand_name('MuranoTe')
@@ -156,7 +187,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
     def add_service(self, environment, data, session):
         """
         This function adding a specific service to environment
-        Returns specific class <Service>
+        Returns a specific class <Service>
         :param environment:
         :param data:
         :param session:
@@ -217,9 +248,9 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             if environment_id in stack.description:
                 return stack
 
-    def check_path(self, environment, path):
-        environment = environment.manager.get(environment.id)
-        ip = environment.services[0]['instance']['floatingIpAddress']
+    def check_path(self, env, path, inst_name):
+        environment = env.manager.get(env.id)
+        ip = self.get_ip_by_instance_name(environment, inst_name)
         resp = requests.get('http://{0}/{1}'.format(ip, path))
         if resp.status_code == 200:
             pass
