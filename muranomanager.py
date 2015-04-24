@@ -134,7 +134,6 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
 
     def deployment_success_check(self, environment, *ports):
         """
-
         :param environment:
         :param ports:
         """
@@ -152,6 +151,12 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             self.fail('Instance does not have floating IP')
 
     def status_check(self, environment, *configurations):
+        """
+        Function which gives opportunity to check multiple instances
+        :param environment: Murano environment
+        :param configurations: List of configurations.
+        Example: [instance_name, *ports], [instance_name, *ports] ...
+        """
         for configuration in configurations:
             name = configuration[0]
             ports = configuration[1:]
@@ -163,11 +168,25 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 self.fail('Instance does not have floating IP')
 
     def get_ip_by_appname(self, environment, appname):
+        """
+        Returns ip of instance with a deployed application using
+        application name
+        :param environment: Murano environment
+        :param appname: Application name or substring of application name
+        :return:
+        """
         for service in environment.services:
             if appname in service['name']:
                 return service['instance']['floatingIpAddress']
 
     def get_ip_by_instance_name(self, environment, name):
+        """
+        Returns ip of instance using instance name
+        :param environment: Murano environment
+        :param name: String, which is substring of name of instance or name of
+        instance
+        :return:
+        """
         for service in environment.services:
             if name in service['instance']['name']:
                 return service['instance']['floatingIpAddress']
@@ -248,9 +267,12 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             if environment_id in stack.description:
                 return stack
 
-    def check_path(self, env, path, inst_name):
+    def check_path(self, env, path, inst_name=None):
         environment = env.manager.get(env.id)
-        ip = self.get_ip_by_instance_name(environment, inst_name)
+        if inst_name:
+            ip = self.get_ip_by_instance_name(environment, inst_name)
+        else:
+            ip = environment.services[0]['instance']['floatingIpAddress']
         resp = requests.get('http://{0}/{1}'.format(ip, path))
         if resp.status_code == 200:
             pass
