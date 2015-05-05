@@ -55,7 +55,10 @@ MuranoGroup = [
                help="image for windows services"),
     cfg.StrOpt('hdp_image',
                default="hdp-sandbox",
-               help="image for hdp-sandbox")
+               help="image for hdp-sandbox"),
+    cfg.StrOpt('kubernetes_image',
+               default="ubuntu14.04-x64-kubernetes",
+               help="image for kubernetes")
 ]
 
 

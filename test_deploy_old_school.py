@@ -147,8 +147,8 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
 
         self.deploy_environment(environment, session)
         self.status_check(environment,
-                          [self.apache['instance']['name'], 22, 80],
-                          [self.mysql['instance']['name'], 22, 3306])
+                          [[self.apache['instance']['name'], 22, 80],
+                           [self.mysql['instance']['name'], 22, 3306]])
         self.check_path(environment, "wordpress",
                         self.apache['instance']['name'])
 

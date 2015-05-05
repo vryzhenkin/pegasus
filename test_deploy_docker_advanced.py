@@ -283,6 +283,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 3306, 5432, 27017)
 
     def test_deploy_docker_jenkins_httpd_mysql_phpzendserver(self):
+        self.skipTest("Skipped due to removed application from repository")
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
@@ -675,6 +676,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 3306, 8080)
 
     def test_deploy_docker_nginxsite_wait_deploy_mysql_phpzendserver(self):
+        self.skipTest("Skipped due to removed application from repository")
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),

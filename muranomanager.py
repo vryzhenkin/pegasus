@@ -37,6 +37,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                       testresources.ResourcedTestCase):
     """This manager provides access to Murano-api service
     """
+
     @classmethod
     def setUpClass(cls):
         super(MuranoTestsCore, cls).setUpClass()
@@ -77,7 +78,6 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
 
     def tearDown(self):
         super(MuranoTestsCore, self).tearDown()
-
         for env in self.environments:
             try:
                 self.environment_delete(env)
@@ -121,7 +121,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
     def check_port_access(self, ip, port):
         result = 1
         start_time = time.time()
-        while time.time() - start_time < 300:
+        while time.time() - start_time < 600:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             result = sock.connect_ex((str(ip), port))
             sock.close()
@@ -129,8 +129,11 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             if result == 0:
                 break
             time.sleep(5)
-
         self.assertEqual(0, result, '%s port is closed on instance' % port)
+        # TODO: Add functionality to wait docker containers to spawn.
+        #start_time = time.time()
+        #while time.time() -start_time < 600:
+        #    requests
 
     def deployment_success_check(self, environment, *ports):
         """
@@ -150,22 +153,40 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         else:
             self.fail('Instance does not have floating IP')
 
-    def status_check(self, environment, *configurations):
+    def status_check(self, environment, configurations, kubernetes=False):
         """
         Function which gives opportunity to check multiple instances
         :param environment: Murano environment
-        :param configurations: List of configurations.
-        Example: [instance_name, *ports], [instance_name, *ports] ...
+        :param configurations: Array of configurations.
+        :param kubernetes: Used for parsing multiple instances in one service
+               False by default.
+        Example: [[instance_name, *ports], [instance_name, *ports]] ...
+        Example k8s: [[cluster['name'], instance_name, *ports], [...], ...]
         """
         for configuration in configurations:
-            name = configuration[0]
-            ports = configuration[1:]
-            ip = self.get_ip_by_instance_name(environment, name)
-            if ip and ports:
-                for port in ports:
-                    self.check_port_access(ip, port)
+            if kubernetes:
+                service_name = configuration[0]
+                print service_name
+                inst_name = configuration[1]
+                print inst_name
+                ports = configuration[2:]
+                print ports
+                ip = self.get_k8s_ip_by_instance_name(environment, inst_name,
+                                                      service_name)
+                if ip and ports:
+                    for port in ports:
+                        self.check_port_access(ip, port)
+                else:
+                    self.fail('Instance does not have floating IP')
             else:
-                self.fail('Instance does not have floating IP')
+                inst_name = configuration[0]
+                ports = configuration[1:]
+                ip = self.get_ip_by_instance_name(environment, inst_name)
+                if ip and ports:
+                    for port in ports:
+                        self.check_port_access(ip, port)
+                else:
+                    self.fail('Instance does not have floating IP')
 
     def get_ip_by_appname(self, environment, appname):
         """
@@ -179,7 +200,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             if appname in service['name']:
                 return service['instance']['floatingIpAddress']
 
-    def get_ip_by_instance_name(self, environment, name):
+    def get_ip_by_instance_name(self, environment, inst_name):
         """
         Returns ip of instance using instance name
         :param environment: Murano environment
@@ -188,8 +209,37 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         :return:
         """
         for service in environment.services:
-            if name in service['instance']['name']:
+            if inst_name in service['instance']['name']:
                 return service['instance']['floatingIpAddress']
+
+    def get_k8s_ip_by_instance_name(self, environment, inst_name, service_name):
+        """
+        Returns ip of specific kubernetes node (gateway, master, minion) based.
+        Search depends on service name of kubernetes and names of spawned
+        instances
+        :param environment: Murano environment
+        :param inst_name: Name of instance or substring of instance name
+        :param service_name: Name of Kube Cluster application in Murano
+        environment
+        :return: Ip of Kubernetes instances
+        """
+        for service in environment.services:
+            if service_name in service['name']:
+                if "gateway" in inst_name:
+                    for gateway in service['gatewayNodes']:
+                        if inst_name in gateway['instance']['name']:
+                            print gateway['instance']['floatingIpAddress']
+                            return gateway['instance']['floatingIpAddress']
+                elif "master" in inst_name:
+                    print service['masterNode']['instance'][
+                        'floatingIpAddress']
+                    return service['masterNode']['instance'][
+                        'floatingIpAddress']
+                elif "minion" in inst_name:
+                    for minion in service['minionNodes']:
+                        if inst_name in minion['instance']['name']:
+                            print minion['instance']['floatingIpAddress']
+                            return minion['instance']['floatingIpAddress']
 
     def create_env(self):
         name = self.rand_name('MuranoTe')
@@ -278,3 +328,4 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             pass
         else:
             self.fail("Service path unavailable")
+    # TODO: Add function to check that environment removed.

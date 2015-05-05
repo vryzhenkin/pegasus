@@ -335,6 +335,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 3306)
 
     def test_deploy_docker_mysql_phpzendserver(self):
+        self.skipTest("Skipped due to removed application from repository")
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
@@ -757,6 +758,9 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
 
     def test_deploy_docker_container(self):
+        self.skipTest("Skipped until suitable application founded")
+        # TODO: Find a new docker application without authorisation
+        # TODO: requirement to download
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
@@ -788,9 +792,10 @@ class MuranoDockerTest(core.MuranoTestsCore):
             "name": self.rand_name("Esearch"),
             "ports": "9200",
             "publish": True,
+            "env": "Key1=Value1, key2=Value2",
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker Elastic Search"
+                    "name": "Docker Container"
                 },
                 "type": "io.murano.apps.docker.DockerApp",
                 "id": str(uuid.uuid4())
