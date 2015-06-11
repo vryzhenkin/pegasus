@@ -18,6 +18,8 @@ import time
 import random
 import json
 import yaml
+import logging
+import telnetlib
 
 import requests
 import testresources
@@ -31,6 +33,15 @@ import muranoclient.common.exceptions as exceptions
 import config as cfg
 
 CONF = cfg.cfg.CONF
+
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
+fh = logging.FileHandler('runner.log')
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - '
+                              '%(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+LOG.addHandler(fh)
 
 
 class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
@@ -75,6 +86,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                         'content-type': 'application/json'}
 
         self.environments = []
+        LOG.debug('Running test: {0}'.format(self._testMethodName))
 
     def tearDown(self):
         super(MuranoTestsCore, self).tearDown()
@@ -108,10 +120,11 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             status = environment.manager.get(environment.id).status
             if time.time() - start_time > 1800:
                 time.sleep(60)
+                self._log_report(environment)
                 self.fail(
                     'Environment deployment is not finished in 1200 seconds')
             elif status == 'deploy failure':
-                print()
+                self._log_report(environment)
                 time.sleep(60)
                 self.fail('Environment has incorrect status {0}'.format(status))
             time.sleep(5)
@@ -131,9 +144,30 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             time.sleep(5)
         self.assertEqual(0, result, '%s port is closed on instance' % port)
         # TODO: Add functionality to wait docker containers to spawn.
-        #start_time = time.time()
-        #while time.time() -start_time < 600:
-        #    requests
+
+    def check_k8s_deployment(self, ip, port):
+        start_time = time.time()
+        while time.time() - start_time < 600:
+            try:
+                LOG.debug('Checking: {0}:{1}'.format(ip, port))
+                self.verify_connection(ip, port)
+                return
+            except RuntimeError as e:
+                time.sleep(10)
+                LOG.debug(e)
+        self.fail('Containers are not ready')
+
+    def verify_connection(self, ip, port):
+        tn = telnetlib.Telnet(ip, port)
+        tn.write('GET / HTTP/1.0\n\n')
+        buf = tn.read_all()
+        LOG.debug('Data:\n {0}'.format(buf))
+        if len(buf) != 0:
+            tn.sock.sendall(telnetlib.IAC + telnetlib.NOP)
+            return
+        else:
+            raise RuntimeError('Resource at {0}:{1} not exist'.
+                               format(ip, port))
 
     def deployment_success_check(self, environment, *ports):
         """
@@ -166,16 +200,17 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         for configuration in configurations:
             if kubernetes:
                 service_name = configuration[0]
-                print service_name
+                LOG.debug('Service: {0}'.format(service_name))
                 inst_name = configuration[1]
-                print inst_name
+                LOG.debug('Instance: {0}'.format(inst_name))
                 ports = configuration[2:]
-                print ports
+                LOG.debug('Acquired ports: {0}'.format(ports))
                 ip = self.get_k8s_ip_by_instance_name(environment, inst_name,
                                                       service_name)
                 if ip and ports:
                     for port in ports:
                         self.check_port_access(ip, port)
+                        self.check_k8s_deployment(ip, port)
                 else:
                     self.fail('Instance does not have floating IP')
             else:
@@ -228,23 +263,24 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 if "gateway" in inst_name:
                     for gateway in service['gatewayNodes']:
                         if inst_name in gateway['instance']['name']:
-                            print gateway['instance']['floatingIpAddress']
+                            LOG.debug(gateway['instance']['floatingIpAddress'])
                             return gateway['instance']['floatingIpAddress']
                 elif "master" in inst_name:
-                    print service['masterNode']['instance'][
-                        'floatingIpAddress']
+                    LOG.debug(service['masterNode']['instance'][
+                        'floatingIpAddress'])
                     return service['masterNode']['instance'][
                         'floatingIpAddress']
                 elif "minion" in inst_name:
                     for minion in service['minionNodes']:
                         if inst_name in minion['instance']['name']:
-                            print minion['instance']['floatingIpAddress']
+                            LOG.debug(minion['instance']['floatingIpAddress'])
                             return minion['instance']['floatingIpAddress']
 
     def create_env(self):
         name = self.rand_name('MuranoTe')
         environment = self.murano.environments.create({'name': name})
         self.environments.append(environment.id)
+        LOG.debug('Created Environment:\n {0}'.format(environment))
         return environment
 
     def create_session(self, environment):
@@ -262,6 +298,8 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         :param session:
         :return:
         """
+
+        LOG.debug('Added service:\n {0}'.format(data))
         return self.murano.services.post(environment.id,
                                          path='/', data=data,
                                          session_id=session.id)
@@ -275,6 +313,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         :param json_data:
         :return:
         """
+        LOG.debug('Added service:\n {0}'.format(json_data))
         headers = self.headers.copy()
         headers.update({'x-configuration-session': session.id})
         endpoint = '{0}environments/{1}/services'.format(self.murano_endpoint,
@@ -328,4 +367,23 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             pass
         else:
             self.fail("Service path unavailable")
+
     # TODO: Add function to check that environment removed.
+
+    def get_last_deployment(self, environment):
+        deployments = self.murano.deployments.list(environment.id)
+        return deployments[0]
+
+    def get_deployment_report(self, environment, deployment):
+        history = ''
+        report = self.murano.deployments.reports(environment.id, deployment.id)
+        for status in report:
+            history += '\t{0} - {1}\n'.format(status.created, status.text)
+        return history
+
+    def _log_report(self, environment):
+        deployment = self.get_last_deployment(environment)
+        details = deployment.result['result']['details']
+        LOG.error('Exception found:\n {0}'.format(details))
+        report = self.get_deployment_report(environment, deployment)
+        LOG.debug('Report:\n {0}\n'.format(report))

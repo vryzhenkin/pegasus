@@ -37,12 +37,6 @@ class MuranoDockerTest(core.MuranoTestsCore):
     def tearDown(self):
         super(MuranoDockerTest, self).tearDown()
 
-        for env in self.environments:
-            try:
-                self.environment_delete(env)
-            except Exception:
-                pass
-
     def test_deploy_docker_influx_grafana(self):
         post_body = {
             "instance": {
@@ -704,7 +698,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
                 "_{id}".format(id=uuid.uuid4().hex): {
                     "name": "Docker HTTPd"
                 },
-                "type": "io.murano.apps.docker.DockerHTTPd",
+                "type": "io.murano.apps.docker.DockerHTTPdSite",
                 "id": str(uuid.uuid4())
             }
         }

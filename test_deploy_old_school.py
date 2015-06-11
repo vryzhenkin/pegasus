@@ -39,14 +39,8 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
     def tearDown(self):
         super(MuranoOldSchoolTest, self).tearDown()
 
-        for env in self.environments:
-            try:
-                self.environment_delete(env)
-            except Exception:
-                pass
-
-    """
     def test_deploy_hdp(self):
+        self.skipTest("HDP Application not in repository")
         post_body = {
             "instance": {
                 "flavor": self.flavor,
@@ -73,7 +67,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
         self.deployment_success_check(environment, 22, 8888)
-    """
+
     # TODO: test fails when floating ip is assigned to both instances. Passes when assign it only to Apache instance.
     def test_deploy_apache_http_mysql_wordpress(self):
         environment = self.create_env()
@@ -247,6 +241,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         self.check_path(environment, "zabbix")
 
     def test_deploy_standalone_docker(self):
+        self.skipTest("TestRun Debian Standart")
         post_body = {
             "instance": {
                 "name": self.rand_name("Docker"),
