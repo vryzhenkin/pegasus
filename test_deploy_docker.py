@@ -38,27 +38,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         super(MuranoDockerTest, self).tearDown()
 
     def test_deploy_docker_influx_grafana(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -104,27 +84,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 8083, 8086, 80)
 
     def test_deploy_docker_mongodb(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -148,27 +108,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 27017)
 
     def test_deploy_docker_nginx(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -192,27 +132,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
 
     def test_deploy_docker_glassfish(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -239,27 +159,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 4848, 8080, 8181)
 
     def test_deploy_docker_mariadb(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -284,27 +184,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 3306)
 
     def test_deploy_docker_mysql(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -330,27 +210,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
 
     def test_deploy_docker_mysql_phpzendserver(self):
         self.skipTest("Skipped due to removed application from repository")
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -398,27 +258,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 3306, 80, 10081)
 
     def test_deploy_docker_jenkins(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -442,27 +282,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 8080)
 
     def test_deploy_docker_postgres(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -487,27 +307,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 5432)
 
     def test_deploy_docker_crate(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -529,27 +329,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 4200, 4300)
 
     def test_deploy_docker_redis(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -573,27 +353,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 6379)
 
     def test_deploy_docker_tomcat(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -618,27 +378,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 8080)
 
     def test_deploy_docker_httpd(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -662,27 +402,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
 
     def test_deploy_docker_httpd_site(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -707,27 +427,7 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
 
     def test_deploy_docker_nginx_site(self):
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,
@@ -752,30 +452,10 @@ class MuranoDockerTest(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
 
     def test_deploy_docker_container(self):
-        self.skipTest("Skipped until suitable application founded")
+        self.skipTest("Skipped until suitable application found")
         # TODO: Find a new docker application without authorisation
         # TODO: requirement to download
-        post_body = {
-            "instance": {
-                "name": self.rand_name("Docker"),
-                "assignFloatingIp": True,
-                "keyname": self.keyname,
-                "flavor": self.flavor,
-                "image": self.docker,
-                "?": {
-                    "type": "io.murano.resources.LinuxMuranoInstance",
-                    "id": str(uuid.uuid4())
-                },
-            },
-            "name": "DockerVM",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker VM Service"
-                },
-                "type": "io.murano.apps.docker.DockerStandaloneHost",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_docker_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.docker_service = self.create_service(environment, session,

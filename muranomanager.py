@@ -20,6 +20,7 @@ import json
 import yaml
 import logging
 import telnetlib
+import uuid
 
 import requests
 import testresources
@@ -93,11 +94,12 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         for env in self.environments:
             try:
                 self.environment_delete(env)
-                time.sleep(60)
+                time.sleep(10)
             except Exception:
                 pass
 
-    def rand_name(self, name='murano_env'):
+    @classmethod
+    def rand_name(cls, name='murano_env'):
         return name + str(random.randint(1, 0x7fffffff))
 
     def environment_delete(self, environment_id, timeout=180):
@@ -128,7 +130,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 time.sleep(60)
                 self.fail('Environment has incorrect status {0}'.format(status))
             time.sleep(5)
-
+        LOG.debug('Environment {0} is ready'.format(environment.name))
         return environment.manager.get(environment.id)
 
     def check_port_access(self, ip, port):
@@ -160,8 +162,11 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
     def verify_connection(self, ip, port):
         tn = telnetlib.Telnet(ip, port)
         tn.write('GET / HTTP/1.0\n\n')
-        buf = tn.read_all()
-        LOG.debug('Data:\n {0}'.format(buf))
+        try:
+            buf = tn.read_all()
+            LOG.debug('Data:\n {0}'.format(buf))
+        except socket.error as e:
+            LOG.debug('Found reset: {0}'.format(e))
         if len(buf) != 0:
             tn.sock.sendall(telnetlib.IAC + telnetlib.NOP)
             return
@@ -387,3 +392,119 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         LOG.error('Exception found:\n {0}'.format(details))
         report = self.get_deployment_report(environment, deployment)
         LOG.debug('Report:\n {0}\n'.format(report))
+
+    @classmethod
+    def get_docker_app(cls):
+        body = {
+            "instance": {
+                "name": cls.rand_name("Docker"),
+                "assignFloatingIp": True,
+                "keyname": cls.keyname,
+                "flavor": cls.flavor,
+                "image": cls.docker,
+                "?": {
+                    "type": "io.murano.resources.LinuxMuranoInstance",
+                    "id": str(uuid.uuid4())
+                },
+            },
+            "name": "DockerVM",
+            "?": {
+                "_{id}".format(id=uuid.uuid4().hex): {
+                    "name": "Docker VM Service"
+                },
+                "type": "io.murano.apps.docker.DockerStandaloneHost",
+                "id": str(uuid.uuid4())
+            }
+        }
+        return body
+
+    @classmethod
+    def get_k8s_app(cls):
+        body = {
+            "gatewayCount": 1,
+            "gatewayNodes": [
+                {
+                    "instance": {
+                        "name": cls.rand_name("gateway-1"),
+                        "assignFloatingIp": True,
+                        "keyname": cls.keyname,
+                        "flavor": cls.flavor,
+                        "image": cls.kubernetes,
+                        "?": {
+                            "type": "io.murano.resources.LinuxMuranoInstance",
+                            "id": str(uuid.uuid4())
+                        }
+                    },
+                    "?": {
+                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
+                        "id": str(uuid.uuid4())
+                    }
+                }
+            ],
+            "?": {
+                "_{id}".format(id=uuid.uuid4().hex): {
+                    "name": "Kubernetes Cluster"
+                },
+                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
+                "id": str(uuid.uuid4())
+            },
+            "nodeCount": 1,
+            "dockerRegistry": "",
+            "masterNode": {
+                "instance": {
+                    "availabilityZone": "nova",
+                    "name": cls.rand_name("master-1"),
+                    "assignFloatingIp": True,
+                    "keyname": cls.keyname,
+                    "flavor": cls.flavor,
+                    "image": cls.kubernetes,
+                    "?": {
+                        "type": "io.murano.resources.LinuxMuranoInstance",
+                        "id": str(uuid.uuid4())
+                    }
+                },
+                "?": {
+                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
+                    "id": str(uuid.uuid4())
+                }
+            },
+            "minionNodes": [
+                {
+                    "instance": {
+                        "name": cls.rand_name("minion-1"),
+                        "assignFloatingIp": True,
+                        "keyname": cls.keyname,
+                        "flavor": cls.flavor,
+                        "image": cls.kubernetes,
+                        "?": {
+                            "type": "io.murano.resources.LinuxMuranoInstance",
+                            "id": str(uuid.uuid4())
+                        }
+                    },
+                    "?": {
+                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
+                        "id": str(uuid.uuid4())
+                    },
+                    "exposeCAdvisor": True
+                }
+            ],
+            "name": cls.rand_name("KubeCluster")
+        }
+        return body
+
+    @classmethod
+    def get_k8s_pod(cls, cluster, replicas, labels):
+        body = {
+            "kubernetesCluster": cluster,
+            "labels": labels,
+            "name": cls.rand_name("pod"),
+            "replicas": replicas,
+            "?": {
+                "_{id}".format(id=uuid.uuid4().hex): {
+                    "name": "Kubernetes Pod"
+                },
+                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
+                "id": str(uuid.uuid4())
+            }
+        }
+        return body

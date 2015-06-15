@@ -39,93 +39,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
         super(MuranoKubeTest, self).tearDown()
 
     def test_deploy_k8s_influx_grafana(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -169,93 +87,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_mongodb(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -279,93 +115,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_nginx(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -391,93 +145,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_glassfish(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -506,93 +178,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_mariadb(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -619,93 +209,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_mysql(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -732,93 +240,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_jenkins(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -845,93 +271,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
 
     def test_deploy_k8s_postgresql(self):
         self.skipTest('Unstable')
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -958,93 +302,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_crate(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -1068,93 +330,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_redis(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -1180,93 +360,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_tomcat(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -1293,93 +391,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_httpd(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -1405,93 +421,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_httpd_site(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
@@ -1518,93 +452,11 @@ class MuranoKubeTest(core.MuranoTestsCore):
                            ], kubernetes=True)
 
     def test_deploy_k8s_nginx_site(self):
-        post_body = {
-            "gatewayCount": 1,
-            "gatewayNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("gateway-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
-                        "id": str(uuid.uuid4())
-                    }
-                }
-            ],
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Cluster"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesCluster",
-                "id": str(uuid.uuid4())
-            },
-            "nodeCount": 1,
-            "dockerRegistry": "",
-            "masterNode": {
-                "instance": {
-                    "availabilityZone": "nova",
-                    "name": self.rand_name("master-1"),
-                    "assignFloatingIp": True,
-                    "keyname": self.keyname,
-                    "flavor": self.flavor,
-                    "image": self.kubernetes,
-                    "?": {
-                        "type": "io.murano.resources.LinuxMuranoInstance",
-                        "id": str(uuid.uuid4())
-                    }
-                },
-                "?": {
-                    "type": "io.murano.apps.docker.kubernetes.KubernetesMasterNode",
-                    "id": str(uuid.uuid4())
-                }
-            },
-            "minionNodes": [
-                {
-                    "instance": {
-                        "name": self.rand_name("minion-1"),
-                        "assignFloatingIp": True,
-                        "keyname": self.keyname,
-                        "flavor": self.flavor,
-                        "image": self.kubernetes,
-                        "?": {
-                            "type": "io.murano.resources.LinuxMuranoInstance",
-                            "id": str(uuid.uuid4())
-                        }
-                    },
-                    "?": {
-                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
-                        "id": str(uuid.uuid4())
-                    },
-                    "exposeCAdvisor": True
-                }
-            ],
-            "name": self.rand_name("KubeCluster")
-        }
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
         self.cluster = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "kubernetesCluster": self.cluster,
-            "labels": "testkey=testvalue",
-            "name": self.rand_name("pod"),
-            "replicas": 0,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Kubernetes Pod"
-                },
-                "type": "io.murano.apps.docker.kubernetes.KubernetesPod",
-                "id": str(uuid.uuid4())
-            }
-        }
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
