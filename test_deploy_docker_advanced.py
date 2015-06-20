@@ -37,12 +37,6 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
     def tearDown(self):
         super(MuranoDockerTestAdvanced, self).tearDown()
 
-        for env in self.environments:
-            try:
-                self.environment_delete(env)
-            except Exception:
-                pass
-
     def test_deploy_docker_crate_nginxsite_glassfish(self):
         post_body = self.get_docker_app()
         environment = self.create_env()
@@ -448,7 +442,8 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(environment)
+        self.docker_service = self.get_service_as_json(
+            environment, self.docker_service['name'])
 
         post_body = {
             "host": self.docker_service,
@@ -494,7 +489,8 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 3306)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(environment)
+        self.docker_service = self.get_service_as_json(
+            environment, self.docker_service['name'])
 
         post_body = {
             "host": self.docker_service,
@@ -542,7 +538,8 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(environment)
+        self.docker_service = self.get_service_as_json(
+            environment, self.docker_service['name'])
 
         post_body = {
             "host": self.docker_service,
@@ -611,7 +608,8 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 8080)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(environment)
+        self.docker_service = self.get_service_as_json(
+            environment, self.docker_service['name'])
 
         post_body = {
             "host": self.docker_service,
@@ -660,7 +658,8 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 4848, 8080, 8181)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(environment)
+        self.docker_service = self.get_service_as_json(
+            environment, self.docker_service['name'])
 
         post_body = {
             "host": self.docker_service,
@@ -706,7 +705,8 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(environment)
+        self.docker_service = self.get_service_as_json(
+            environment, self.docker_service['name'])
 
         post_body = {
             "host": self.docker_service,
@@ -753,7 +753,8 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 5432)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(environment)
+        self.docker_service = self.get_service_as_json(
+            environment, self.docker_service['name'])
 
         post_body = {
             "host": self.docker_service,
@@ -801,7 +802,8 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 27017)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(environment)
+        self.docker_service = self.get_service_as_json(
+            environment, self.docker_service['name'])
 
         post_body = {
             "host": self.docker_service,

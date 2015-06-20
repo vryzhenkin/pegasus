@@ -165,14 +165,14 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         try:
             buf = tn.read_all()
             LOG.debug('Data:\n {0}'.format(buf))
+            if len(buf) != 0:
+                tn.sock.sendall(telnetlib.IAC + telnetlib.NOP)
+                return
+            else:
+                raise RuntimeError('Resource at {0}:{1} not exist'.
+                                   format(ip, port))
         except socket.error as e:
             LOG.debug('Found reset: {0}'.format(e))
-        if len(buf) != 0:
-            tn.sock.sendall(telnetlib.IAC + telnetlib.NOP)
-            return
-        else:
-            raise RuntimeError('Resource at {0}:{1} not exist'.
-                               format(ip, port))
 
     def deployment_success_check(self, environment, *ports):
         """
@@ -333,11 +333,12 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
     def get_environment(self, environment):
         return self.murano.environments.get(environment.id)
 
-    def get_service_as_json(self, environment):
-        service = self.murano.services.list(environment.id)[0]
-        service = service.to_dict()
-        service = json.dumps(service)
-        return yaml.load(service)
+    def get_service_as_json(self, environment, service_name):
+        for service in self.murano.services.list(environment.id):
+            if service.name == service_name:
+                service = service.to_dict()
+                service = json.dumps(service)
+                return yaml.load(service)
 
     def _quick_deploy(self, name, *apps):
         environment = self.murano.environments.create({'name': name})
