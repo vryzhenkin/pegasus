@@ -15,8 +15,8 @@
 
 import uuid
 
-import config as cfg
-import muranomanager as core
+from etc import config as cfg
+from pegasus.bases import muranobase as core
 
 CONF = cfg.cfg.CONF
 

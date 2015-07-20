@@ -15,40 +15,39 @@
 
 import uuid
 
-import config as cfg
-import muranomanager as core
+from etc import config as cfg
+from pegasus.bases import muranobase as core
 
 CONF = cfg.cfg.CONF
 
 
-class MuranoDockerTest(core.MuranoTestsCore):
+class TestKubeSimple(core.MuranoTestsCore):
     @classmethod
     def setUpClass(cls):
-        super(MuranoDockerTest, cls).setUpClass()
+        super(TestKubeSimple, cls).setUpClass()
 
-        cls.docker = CONF.murano.docker_image
+        cls.kubernetes = CONF.murano.kubernetes_image
         cls.flavor = CONF.murano.standard_flavor
 
     def setUp(self):
-        super(MuranoDockerTest, self).setUp()
+        super(TestKubeSimple, self).setUp()
 
         self.environments = []
 
     def tearDown(self):
-        super(MuranoDockerTest, self).tearDown()
+        super(TestKubeSimple, self).tearDown()
 
-    def test_deploy_docker_influx_grafana(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_influx_grafana(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
-            "image": 'tutum/influxdb',
+            "host": self.pod,
             "name": self.rand_name("Influx"),
-            "interfacePort": 8083,
-            "apiPort": 8086,
             "preCreateDB": 'db1;db2',
             "publish": True,
             "?": {
@@ -61,11 +60,10 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.influx_service = self.create_service(environment, session,
                                                   post_body)
+
         post_body = {
-            "host": self.docker_service,
-            "image": 'tutum/grafana',
+            "host": self.pod,
             "name": self.rand_name("Grafana"),
-            "port": 80,
             "influxDB": self.influx_service,
             "grafanaUser": self.rand_name("user"),
             "grafanaPassword": self.rand_name("pass"),
@@ -81,19 +79,23 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 8083, 8086, 80)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 8083, 8086, 80]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_mongodb(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_mongodb(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
-            #"image": 'mongo',
+            "host": self.pod,
             "name": self.rand_name("Mongo"),
-            #"port": 27017,
             "publish": True,
             "?": {
                 "_{id}".format(id=uuid.uuid4().hex): {
@@ -105,16 +107,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 27017)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 27017]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_nginx(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_nginx(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'nginx',
             "name": self.rand_name("Nginx"),
             "port": 80,
@@ -129,16 +137,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 80)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 80]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_glassfish(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_glassfish(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'tutum/glassfish',
             "name": self.rand_name("Glass"),
             "password": self.rand_name("O5t@"),
@@ -156,16 +170,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 4848, 8080, 8181)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 4848, 8080]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_mariadb(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_mariadb(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'tutum/mariadb',
             "name": self.rand_name("MariaDB"),
             "port": 3306,
@@ -181,16 +201,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 3306)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 3306]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_mysql(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_mysql(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'mysql',
             "name": self.rand_name("MySQL"),
             "port": 3306,
@@ -206,65 +232,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 3306)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 3306]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_mysql_phpzendserver(self):
-        self.skipTest("Skipped due to removed application from repository")
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_jenkins(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
 
         post_body = {
-            "host": self.docker_service,
-            "image": 'mysql',
-            "name": self.rand_name("MySQL"),
-            "port": 3306,
-            "password": self.rand_name("O5t@"),
-            "publish": True,
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker MySQL"
-                },
-                "type": "io.murano.apps.docker.DockerMySQL",
-                "id": str(uuid.uuid4())
-            }
-        }
-        self.mysql = self.create_service(environment, session, post_body)
-
-        post_body = {
-            "host": self.docker_service,
-            "image": 'php-zendserver',
-            "name": self.rand_name("PHP-Zend"),
-            "port": 80,
-            "adminPort": 10081,
-            "password": self.rand_name("O5t@"),
-            "publish": True,
-            "database": self.mysql,
-            "dbName": self.rand_name(""),
-            "dbUser": self.rand_name("Us3@"),
-            "dbPass": self.rand_name("P@s5"),
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker PHP-ZendServer"
-                },
-                "type": "io.murano.apps.docker.DockerPHPZendServer",
-                "id": str(uuid.uuid4())
-            }
-        }
-        self.create_service(environment, session, post_body)
-        self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 3306, 80, 10081)
-
-    def test_deploy_docker_jenkins(self):
-        post_body = self.get_docker_app()
-        environment = self.create_env()
-        session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
-        post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'jenkins',
             "name": self.rand_name("Jenkins"),
             "port": 8080,
@@ -279,16 +262,23 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 8080)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 8080]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_postgres(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_postgresql(self):
+        self.skipTest('Unstable')
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'postgres',
             "name": self.rand_name("Postgres"),
             "port": 5432,
@@ -304,16 +294,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 5432)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 5432]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_crate(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_crate(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "name": self.rand_name("Crate"),
             "publish": True,
             "?": {
@@ -326,16 +322,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 4200, 4300)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 4200]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_redis(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_redis(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'redis',
             "name": self.rand_name("Redis"),
             "port": 6379,
@@ -350,16 +352,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 6379)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 6379]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_tomcat(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_tomcat(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'tutum/tomcat',
             "name": self.rand_name("Tomcat"),
             "port": 8080,
@@ -375,16 +383,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 8080)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 8080]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_httpd(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_httpd(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'httpd',
             "name": self.rand_name("HTTPd"),
             "port": 80,
@@ -399,16 +413,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 80)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 80]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_httpd_site(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_httpd_site(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'httpd',
             "name": self.rand_name("HTTPd"),
             "port": 80,
@@ -424,16 +444,22 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 80)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 80]
+                           ], kubernetes=True)
 
-    def test_deploy_docker_nginx_site(self):
-        post_body = self.get_docker_app()
+    def test_deploy_k8s_nginx_site(self):
+        post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
+        self.cluster = self.create_service(environment, session, post_body)
+        post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
         post_body = {
-            "host": self.docker_service,
+            "host": self.pod,
             "image": 'nginx',
             "name": self.rand_name("NginxS"),
             "port": 80,
@@ -449,32 +475,8 @@ class MuranoDockerTest(core.MuranoTestsCore):
         }
         self.create_service(environment, session, post_body)
         self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 80)
-
-    def test_deploy_docker_container(self):
-        self.skipTest("Skipped until suitable application found")
-        # TODO: Find a new docker application without authorisation
-        # TODO: requirement to download
-        post_body = self.get_docker_app()
-        environment = self.create_env()
-        session = self.create_session(environment)
-        self.docker_service = self.create_service(environment, session,
-                                                  post_body)
-        post_body = {
-            "host": self.docker_service,
-            "image": 'tutum/elasticsearch',
-            "name": self.rand_name("Esearch"),
-            "ports": "9200",
-            "publish": True,
-            "env": "Key1=Value1, key2=Value2",
-            "?": {
-                "_{id}".format(id=uuid.uuid4().hex): {
-                    "name": "Docker Container"
-                },
-                "type": "io.murano.apps.docker.DockerApp",
-                "id": str(uuid.uuid4())
-            }
-        }
-        self.create_service(environment, session, post_body)
-        self.deploy_environment(environment, session)
-        self.deployment_success_check(environment, 22, 9200)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 80]
+                           ], kubernetes=True)

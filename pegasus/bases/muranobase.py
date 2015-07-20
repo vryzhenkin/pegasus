@@ -17,21 +17,20 @@ import socket
 import time
 import random
 import json
-import yaml
 import logging
 import telnetlib
 import uuid
 
+import yaml
 import requests
 import testresources
 import testtools
-
 from heatclient import client as heatclient
 from keystoneclient.v2_0 import client as keystoneclient
 from muranoclient import client as muranoclient
 import muranoclient.common.exceptions as exceptions
 
-import config as cfg
+from etc import config as cfg
 
 CONF = cfg.cfg.CONF
 
@@ -145,7 +144,6 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 break
             time.sleep(5)
         self.assertEqual(0, result, '%s port is closed on instance' % port)
-        # TODO: Add functionality to wait docker containers to spawn.
 
     def check_k8s_deployment(self, ip, port):
         start_time = time.time()
