@@ -2,7 +2,7 @@
 
 USER=$(whoami)
 
-if ${USER}=='root'; then
+if [ ${USER}==root ]; then
     CWD=/root
 else
     CWD=/home/${USER}
