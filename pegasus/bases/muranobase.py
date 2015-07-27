@@ -25,12 +25,10 @@ import yaml
 import requests
 import testresources
 import testtools
-from heatclient import client as heatclient
-from keystoneclient.v2_0 import client as keystoneclient
-from muranoclient import client as muranoclient
 import muranoclient.common.exceptions as exceptions
 
 from etc import config as cfg
+from pegasus.common import clients
 
 CONF = cfg.cfg.CONF
 
@@ -45,7 +43,7 @@ LOG.addHandler(fh)
 
 
 class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
-                      testresources.ResourcedTestCase):
+                      testresources.ResourcedTestCase, clients.OsClients):
     """This manager provides access to Murano-api service
     """
 
@@ -54,16 +52,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         super(MuranoTestsCore, cls).setUpClass()
 
         cfg.load_config()
-        cls.keystone = keystoneclient.Client(username=CONF.murano.user,
-                                             password=CONF.murano.password,
-                                             tenant_name=CONF.murano.tenant,
-                                             auth_url=CONF.murano.auth_url)
-        murano_url = cls.keystone.service_catalog.url_for(
-            service_type='application_catalog', endpoint_type='publicURL')
-        cls.murano_url = murano_url if 'v1' not in murano_url else "/".join(
-            murano_url.split('/')[:murano_url.split('/').index('v1')])
-        cls.heat_url = cls.keystone.service_catalog.url_for(
-            service_type='orchestration', endpoint_type='publicURL')
+        cls.keystone = cls._get_auth()
         cls.murano_endpoint = cls.murano_url + '/v1/'
         cls.keyname = CONF.murano.keyname
 
@@ -74,14 +63,9 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
 
     def setUp(self):
         super(MuranoTestsCore, self).setUp()
-        self.keystone = keystoneclient.Client(username=CONF.murano.user,
-                                              password=CONF.murano.password,
-                                              tenant_name=CONF.murano.tenant,
-                                              auth_url=CONF.murano.auth_url)
-        self.heat = heatclient.Client('1', endpoint=self.heat_url,
-                                      token=self.keystone.auth_token)
-        self.murano = muranoclient.Client(
-            '1', endpoint=self.murano_url, token=self.keystone.auth_token)
+        self.keystone = self._get_auth()
+        self.heat = self.get_heat_client()
+        self.murano = self.get_murano_client()
         self.headers = {'X-Auth-Token': self.murano.auth_token,
                         'content-type': 'application/json'}
 
