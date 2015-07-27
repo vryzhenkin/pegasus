@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+USER = $(whoami)
+CWD = /home/${USER}
+PEGASUS_DIR = ${CWD}/pegasus
+
+source ${PEGASUS_DIR}/tools/init_env_variables.sh
+
 install_system_requirements() {
     message "Enable default CentOS repo"
     yum -y reinstall centos-release
@@ -41,11 +47,13 @@ install_python27_pip_virtualenv() {
 install_system_requirements
 install_python27_pip_virtualenv
 
-python tools/install_venv.py
+cd ${PEGASUS_DIR}
+
+python ${PEGASUS_DIR}/tools/install_venv.py
 
 source .venv/bin/activate
 
-source openrc
+source ${PEGASUS_DIR}/openrc
 
 murano bundle-import --is-public --exists-action s app-servers
 murano bundle-import --is-public --exists-action s container-based-apps
