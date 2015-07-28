@@ -48,7 +48,7 @@ MuranoGroup = [
                default='debian-8-m-agent.qcow2',
                help="image for linux services"),
     cfg.StrOpt('docker_image',
-               default='ubuntu14.04-x64-docker',
+               default='debian-8-docker.qcow2',
                help="image for docker applications"),
     cfg.StrOpt('windows_image',
                default='default_windows',
