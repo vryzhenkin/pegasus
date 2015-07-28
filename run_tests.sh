@@ -14,7 +14,7 @@ MURANO_TESTS_DIR=${PEGASUS_DIR}/pegasus/tests/murano/
 
 source ${PEGASUS_DIR}/tools/prepare_tests.sh
 
-source ${VIRTUALENV_DIR}/bin/activate
+source ${PEGASUS_DIR}/.venv/bin/activate
 
 nosetests -v --with-openstack --openstack-show-elapsed --openstack-color \
 --with-html-output --html-out-file=${PEGASUS_DIR}/pegasus_results.html \
