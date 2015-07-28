@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
 
-USER=$(whoami)
-
-if [ ${USER}==root ]; then
-    CWD=/root
-else
-    CWD=/home/${USER}
-fi
-
-PEGASUS_DIR=${CWD}/pegasus
-
 source ${PEGASUS_DIR}/tools/init_env_variables.sh
 
 install_system_requirements() {
