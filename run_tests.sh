@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-USER=$(whoami)
+USER_NAME=$(whoami)
 
-if [ ${USER}==root ]; then
+if [ ${USER_NAME}==root ]; then
     CWD=/root
 else
     CWD=/home/${USER}
@@ -20,3 +20,4 @@ nosetests -v --with-openstack --openstack-show-elapsed --openstack-color \
 --with-html-output --html-out-file=${PEGASUS_DIR}/pegasus_results.html \
 --with-xunit --xunit-file=${PEGASUS_DIR}/pegasus_results.xml ${MURANO_TESTS_DIR}
 
+deactivate
