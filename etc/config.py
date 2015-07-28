@@ -14,7 +14,7 @@
 
 import os
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 
 murano_group = cfg.OptGroup(name='murano', title="murano")
@@ -36,16 +36,16 @@ MuranoGroup = [
                default='',
                help='name of keypair for debugging'),
     cfg.StrOpt('murano_url',
-               default='http://127.0.0.1:8082/v1/',
+               default='http://127.0.0.1:8082',
                help="murano url"),
     cfg.StrOpt('standard_flavor',
                default='m1.medium',
                help="flavor for sanity tests"),
     cfg.StrOpt('advanced_flavor',
-               default='m1.large',
+               default='m1.medium',
                help="flavor for advanced tests"),
     cfg.StrOpt('linux_image',
-               default='default_linux',
+               default='debian-8-m-agent.qcow2',
                help="image for linux services"),
     cfg.StrOpt('docker_image',
                default='ubuntu14.04-x64-docker',

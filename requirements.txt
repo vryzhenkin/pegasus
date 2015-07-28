@@ -10,3 +10,4 @@ nosehtmloutput>=0.0.3
 nosexcover
 openstack-doc-tools>=0.23
 openstack.nose_plugin>=0.7
+oslo.config>=1.11.0
