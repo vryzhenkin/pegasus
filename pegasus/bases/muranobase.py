@@ -53,6 +53,8 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
 
         cfg.load_config()
         cls.keystone = cls._get_auth()
+        cls.murano_url = cls._get_endpoint(service_type='application_catalog',
+                                            endpoint_type='publicURL')
         cls.murano_endpoint = cls.murano_url + '/v1/'
         cls.keyname = CONF.murano.keyname
 

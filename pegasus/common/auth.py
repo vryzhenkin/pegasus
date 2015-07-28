@@ -19,13 +19,13 @@ class BasicAuth(object):
             username = username or CONF.murano.user
             password = password or CONF.murano.password
             tenant_name = tenant_name or CONF.murano.tenant
-            auth_url = uri or CONF.murano.auth_url
+            uri = uri or CONF.murano.auth_url
 
         def get_keystone_client():
             keystone = keystoneclient.Client(username=username,
                                              password=password,
                                              tenant_name=tenant_name,
-                                             auth_url=auth_url)
+                                             auth_url=uri)
             return keystone
 
         return get_keystone_client()
@@ -34,6 +34,6 @@ class BasicAuth(object):
     def _get_endpoint(cls, service_type, endpoint_type):
         keystone = cls._get_auth()
         endpoint = \
-            keystone.service_catalog_url_for(service_type=service_type,
+            keystone.service_catalog.url_for(service_type=service_type,
                                              endpoint_type=endpoint_type)
         return endpoint
