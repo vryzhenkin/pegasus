@@ -15,6 +15,8 @@
 
 import uuid
 
+from nose.plugins.attrib import attr as tag
+
 from etc import config as cfg
 from pegasus.bases import muranobase as core
 
@@ -331,6 +333,7 @@ class TestKubeAdvanced(core.MuranoTestsCore):
                            [self.cluster['name'], "gateway-1", 3306, 80, 6379]
                            ], kubernetes=True)
 
+    @tag('light')
     def test_k8s_deploy_mysql_wait_deploy_tomcat(self):
         post_body = self.get_k8s_app()
         environment = self.create_env()
@@ -384,6 +387,7 @@ class TestKubeAdvanced(core.MuranoTestsCore):
                            [self.cluster['name'], "gateway-1", 3306, 8080]
                            ], kubernetes=True)
 
+    @tag('light')
     def test_k8s_deploy_nginx_wait_deploy_httpd_multipod(self):
         post_body = self.get_k8s_app()
         environment = self.create_env()

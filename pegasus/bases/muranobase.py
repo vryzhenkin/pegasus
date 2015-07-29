@@ -44,15 +44,13 @@ LOG.addHandler(fh)
 
 class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                       testresources.ResourcedTestCase, clients.OsClients):
-    """This manager provides access to Murano-api service
-    """
+    """This manager provides access to Murano-api service."""
 
     @classmethod
     def setUpClass(cls):
         super(MuranoTestsCore, cls).setUpClass()
 
         cfg.load_config()
-        cls.keystone = cls._get_auth()
         cls.murano_url = cls._get_endpoint(service_type='application_catalog',
                                             endpoint_type='publicURL')
         cls.murano_endpoint = cls.murano_url + '/v1/'
@@ -66,8 +64,8 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
     def setUp(self):
         super(MuranoTestsCore, self).setUp()
         self.keystone = self._get_auth()
-        self.heat = self.get_heat_client()
-        self.murano = self.get_murano_client()
+        self.heat = self.get_heat_client(self.keystone)
+        self.murano = self.get_murano_client(self.keystone)
         self.headers = {'X-Auth-Token': self.murano.auth_token,
                         'content-type': 'application/json'}
 

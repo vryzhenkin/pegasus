@@ -15,6 +15,8 @@
 
 import uuid
 
+from nose.plugins.attrib import attr as tag
+
 from etc import config as cfg
 from pegasus.bases import muranobase as core
 
@@ -68,7 +70,7 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         self.deploy_environment(environment, session)
         self.deployment_success_check(environment, 22, 8888)
 
-    # TODO: test fails when floating ip is assigned to both instances. Passes when assign it only to Apache instance.
+    @tag('light')
     def test_deploy_apache_http_mysql_wordpress(self):
         environment = self.create_env()
         session = self.create_session(environment)

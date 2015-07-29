@@ -15,6 +15,8 @@
 
 import uuid
 
+from nose.plugins.attrib import attr as tag
+
 from etc import config as cfg
 from pegasus.bases import muranobase as core
 
@@ -37,6 +39,7 @@ class TestKubeSimple(core.MuranoTestsCore):
     def tearDown(self):
         super(TestKubeSimple, self).tearDown()
 
+    @tag('light')
     def test_deploy_k8s_influx_grafana(self):
         post_body = self.get_k8s_app()
         environment = self.create_env()

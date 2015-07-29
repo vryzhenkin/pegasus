@@ -15,6 +15,8 @@
 
 import uuid
 
+from nose.plugins.attrib import attr as tag
+
 from etc import config as cfg
 from pegasus.bases import muranobase as core
 
@@ -417,6 +419,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deploy_environment(environment, session)
         self.deployment_success_check(environment, 22, 3306, 80, 6379)
 
+    @tag('light')
     def test_deploy_docker_nginx_wait_deploy_httpd(self):
         post_body = self.get_docker_app()
         environment = self.create_env()
