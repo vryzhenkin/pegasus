@@ -13,10 +13,19 @@ script_dir() {
 
 PEGASUS_DIR=$(script_dir)
 
+source ${PEGASUS_DIR}/tools/init_env_variables.sh
+
 if [ ! -f ${PEGASUS_DIR}/openrc ]; then
     message "openrc file not found. Exiting."
     message "Please, put your openrc to top directory of Pegasus"
     exit 1
+fi
+
+if [[ -z ${mode} ]]; then
+    message "Looks like you started tests without mode."
+    echo "You can start a light test-run using './run_tests.sh light.'"
+    echo "Or if you want to perform full run, you need to use './run_tests.sh full'"
+    exit 0
 fi
 
 MURANO_TESTS_DIR=${PEGASUS_DIR}/pegasus/tests/murano/
@@ -38,10 +47,6 @@ case ${mode} in
     --with-html-output --html-out-file=${PEGASUS_DIR}/pegasus_results.html \
     --with-xunit --xunit-file=${PEGASUS_DIR}/pegasus_results.xml ${MURANO_TESTS_DIR}
     ;;
-    "")
-    message "Looks like you started tests without mode."
-    echo "You can start a light test-run using './run_tests.sh light.'"
-    echo "Or if you want to perform full run, you need to use './run_tests.sh full'"
 esac
 
 RETVAL=$?
