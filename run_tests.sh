@@ -16,7 +16,7 @@ PEGASUS_DIR=$(script_dir)
 source ${PEGASUS_DIR}/tools/init_env_variables.sh
 
 if [ ! -f ${PEGASUS_DIR}/openrc ]; then
-    message "openrc file not found. Exiting."
+    error "openrc file not found. Exiting."
     message "Please, put your openrc to top directory of Pegasus"
     exit 1
 fi
@@ -25,7 +25,7 @@ if [[ -z ${mode} ]]; then
     message "Looks like you started tests without mode."
     echo "You can start a light test-run using './run_tests.sh light.'"
     echo "Or if you want to perform full run, you need to use './run_tests.sh full'"
-    exit 0
+    exit 1
 fi
 
 MURANO_TESTS_DIR=${PEGASUS_DIR}/pegasus/tests/murano/
