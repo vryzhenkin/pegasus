@@ -9,6 +9,7 @@ install_system_requirements() {
     message "Installing system requirements"
     yum -y install git
     yum -y install gcc
+    yum -y install python-devel
     yum -y install zlib-devel
     yum -y install readline-devel
     yum -y install bzip2-devel
