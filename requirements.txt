@@ -1,7 +1,7 @@
 testtools
 testresources
 python-heatclient
-python-muranoclient
+python-muranoclient!=0.6.3
 python-keystoneclient
 requests
 nose

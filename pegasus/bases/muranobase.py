@@ -26,6 +26,7 @@ import requests
 import testresources
 import testtools
 import muranoclient.common.exceptions as exceptions
+import heatclient.exc as hexc
 
 from etc import config as cfg
 from pegasus.common import clients
@@ -77,6 +78,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         for env in self.environments:
             try:
                 self.environment_delete(env)
+                self.purge_stacks(env)
                 time.sleep(10)
             except Exception:
                 pass
@@ -86,7 +88,21 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         return name + str(random.randint(1, 0x7fffffff))
 
     def environment_delete(self, environment_id, timeout=180):
-        self.murano.environments.delete(environment_id)
+        try:
+            self.murano.environments.delete(environment_id)
+            start_time = time.time()
+            while time.time() - start_time < timeout:
+                try:
+                    self.murano.environments.get(environment_id)
+                except exceptions.HTTPNotFound:
+                    return
+            raise exceptions.HTTPOverLimit(
+                'Environment {0} was not deleted in {1} seconds'.format(
+                    environment_id, timeout))
+        except exceptions.HTTPForbidden or exceptions.HTTPOverLimit:
+            self.murano.environments.delete(environment_id, abandon=True)
+            LOG.warning('Environment {0} from test {1} abandoned'.format(
+                environment_id, self._testMethodName))
 
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -343,6 +359,13 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         for stack in self.heat.stacks.list():
             if environment_id in stack.description:
                 return stack
+
+    def purge_stacks(self, environment_id):
+        stack = self._get_stack(environment_id)
+        if not stack:
+            return
+        else:
+            self.heat.stacks.delete(stack.id)
 
     def check_path(self, env, path, inst_name=None):
         environment = env.manager.get(env.id)
