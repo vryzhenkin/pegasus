@@ -55,6 +55,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                                             endpoint_type='publicURL')
         cls.murano_endpoint = cls.murano_url + '/v1/'
         cls.keyname = CONF.murano.keyname
+        cls.availability_zone = CONF.murano.availability_zone
 
     @classmethod
     def upload_package(cls, package_name, body, app, ):

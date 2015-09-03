@@ -32,7 +32,6 @@ class MuranoOldSchoolTest(core.MuranoTestsCore):
         cls.flavor = CONF.murano.standard_flavor
         cls.linux = CONF.murano.linux_image
         cls.hdp_image = CONF.murano.hdp_image
-        cls.availability_zone = CONF.murano.availability_zone
 
     def setUp(self):
         super(MuranoOldSchoolTest, self).setUp()
