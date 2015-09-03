@@ -408,7 +408,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 "keyname": cls.keyname,
                 "flavor": cls.flavor,
                 "image": cls.docker,
-                "availability_zone": cls.availability_zone,
+                "availabilityZone": cls.availability_zone,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -437,7 +437,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                         "keyname": cls.keyname,
                         "flavor": cls.flavor,
                         "image": cls.kubernetes,
-                        "availability_zone": self.availability_zone,
+                        "availabilityZone": cls.availability_zone,
                         "?": {
                             "type": "io.murano.resources.LinuxMuranoInstance",
                             "id": str(uuid.uuid4())
@@ -460,13 +460,12 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             "dockerRegistry": "",
             "masterNode": {
                 "instance": {
-                    "availabilityZone": "nova",
                     "name": cls.rand_name("master-1"),
                     "assignFloatingIp": True,
                     "keyname": cls.keyname,
                     "flavor": cls.flavor,
                     "image": cls.kubernetes,
-                    "availability_zone": self.availability_zone,
+                    "availabilityZone": cls.availability_zone,
                     "?": {
                         "type": "io.murano.resources.LinuxMuranoInstance",
                         "id": str(uuid.uuid4())
@@ -485,7 +484,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                         "keyname": cls.keyname,
                         "flavor": cls.flavor,
                         "image": cls.kubernetes,
-                        "availability_zone": cls.availability_zone,
+                        "availabilityZone": cls.availability_zone,
                         "?": {
                             "type": "io.murano.resources.LinuxMuranoInstance",
                             "id": str(uuid.uuid4())
