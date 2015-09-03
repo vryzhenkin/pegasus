@@ -1,7 +1,7 @@
 testtools
 testresources
 python-heatclient
-python-muranoclient!=0.6.3
+python-muranoclient
 python-keystoneclient
 requests
 nose
@@ -11,3 +11,4 @@ nosexcover
 openstack-doc-tools>=0.23
 openstack.nose_plugin>=0.7
 oslo.config>=1.11.0
+oslo.log

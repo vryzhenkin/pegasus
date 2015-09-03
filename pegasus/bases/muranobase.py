@@ -26,7 +26,6 @@ import requests
 import testresources
 import testtools
 import muranoclient.common.exceptions as exceptions
-import heatclient.exc as hexc
 
 from etc import config as cfg
 from pegasus.common import clients
@@ -99,7 +98,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             raise exceptions.HTTPOverLimit(
                 'Environment {0} was not deleted in {1} seconds'.format(
                     environment_id, timeout))
-        except exceptions.HTTPForbidden or exceptions.HTTPOverLimit:
+        except (exceptions.HTTPForbidden, exceptions.HTTPOverLimit):
             self.murano.environments.delete(environment_id, abandon=True)
             LOG.warning('Environment {0} from test {1} abandoned'.format(
                 environment_id, self._testMethodName))
@@ -408,6 +407,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 "keyname": cls.keyname,
                 "flavor": cls.flavor,
                 "image": cls.docker,
+                "availability_zone": cls.availability_zone,
                 "?": {
                     "type": "io.murano.resources.LinuxMuranoInstance",
                     "id": str(uuid.uuid4())
@@ -436,6 +436,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                         "keyname": cls.keyname,
                         "flavor": cls.flavor,
                         "image": cls.kubernetes,
+                        "availability_zone": self.availability_zone,
                         "?": {
                             "type": "io.murano.resources.LinuxMuranoInstance",
                             "id": str(uuid.uuid4())
@@ -464,6 +465,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                     "keyname": cls.keyname,
                     "flavor": cls.flavor,
                     "image": cls.kubernetes,
+                    "availability_zone": self.availability_zone,
                     "?": {
                         "type": "io.murano.resources.LinuxMuranoInstance",
                         "id": str(uuid.uuid4())
@@ -482,6 +484,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                         "keyname": cls.keyname,
                         "flavor": cls.flavor,
                         "image": cls.kubernetes,
+                        "availability_zone": cls.availability_zone,
                         "?": {
                             "type": "io.murano.resources.LinuxMuranoInstance",
                             "id": str(uuid.uuid4())
