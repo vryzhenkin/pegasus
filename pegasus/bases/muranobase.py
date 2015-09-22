@@ -161,9 +161,9 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         self.fail('Containers are not ready')
 
     def verify_connection(self, ip, port, negative=False):
-        tn = telnetlib.Telnet(ip, port)
-        tn.write('GET / HTTP/1.0\n\n')
         try:
+            tn = telnetlib.Telnet(ip, port)
+            tn.write('GET / HTTP/1.0\n\n')
             buf = tn.read_all()
             LOG.debug('Data:\n {0}'.format(buf))
             if negative and len(buf) == 0:
