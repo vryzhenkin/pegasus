@@ -148,9 +148,9 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         else:
             self.assertEqual(0, result, '%s port is closed on instance' % port)
 
-    def check_k8s_deployment(self, ip, port, negative=False):
+    def check_k8s_deployment(self, ip, port, timeout=1200, negative=False):
         start_time = time.time()
-        while time.time() - start_time < 600:
+        while time.time() - start_time < timeout:
             try:
                 LOG.debug('Checking: {0}:{1}'.format(ip, port))
                 self.verify_connection(ip, port, negative)
