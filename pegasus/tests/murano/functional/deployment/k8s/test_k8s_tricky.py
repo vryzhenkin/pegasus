@@ -84,6 +84,7 @@ class TestKubeTricky(core.MuranoTestsCore):
             }
         }
         self.create_service(environment, session, post_body)
+        self.deploy_environment(environment, session)
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
                            [self.cluster['name'], "minion-1", 4194],

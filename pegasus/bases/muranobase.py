@@ -335,6 +335,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                              headers=headers).json()
 
     def delete_service(self, environment, session, service):
+        LOG.debug('Removed service: {0}'.format(service.name))
         self.murano.services.delete(
             environment.id, path='/{0}'.format(self.get_service_id(service)),
             session_id=session.id)
