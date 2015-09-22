@@ -48,7 +48,7 @@ case ${mode} in
     --with-xunit --xunit-file=${PEGASUS_DIR}/pegasus_results.xml ${MURANO_TESTS_DIR}
     ;;
     prepare)
-    message "Reay for testing!"
+    message "Ready for testing!"
     ;;
 esac
 

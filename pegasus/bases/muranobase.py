@@ -140,7 +140,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             result = sock.connect_ex((str(ip), port))
             sock.close()
 
-            if result == 0:
+            if result == 0 or negative:
                 break
             time.sleep(5)
         if negative:
