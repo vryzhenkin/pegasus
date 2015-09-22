@@ -67,6 +67,7 @@ class TestKubeTricky(core.MuranoTestsCore):
 
         environment = self.get_environment(environment)
         session = self.create_session(environment)
+        self.pod = self.get_service(environment, self.pod['name'])
         service_for_removal = self.get_service(environment, nginx['name'],
                                                to_json=False)
         environment = self.delete_service(environment, session,
