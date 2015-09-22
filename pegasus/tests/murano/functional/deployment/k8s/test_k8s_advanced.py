@@ -364,7 +364,7 @@ class TestKubeAdvanced(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.pod = self.get_service_as_json(environment, self.pod['name'])
+        self.pod = self.get_service(environment, self.pod['name'])
 
         post_body = {
             "host": self.pod,
@@ -417,7 +417,7 @@ class TestKubeAdvanced(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.cluster = self.get_service_as_json(environment,
+        self.cluster = self.get_service(environment,
                                                 self.cluster['name'])
         post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod2 = self.create_service(environment, session, post_body)
@@ -472,7 +472,7 @@ class TestKubeAdvanced(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.pod = self.get_service_as_json(environment, self.pod['name'])
+        self.pod = self.get_service(environment, self.pod['name'])
 
         post_body = {
             "host": self.pod,
@@ -525,7 +525,7 @@ class TestKubeAdvanced(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.cluster = self.get_service_as_json(environment,
+        self.cluster = self.get_service(environment,
                                                 self.cluster['name'])
         post_body = self.get_k8s_pod(self.cluster, 0, "testkey=testvalue")
         self.pod2 = self.create_service(environment, session, post_body)
@@ -579,7 +579,7 @@ class TestKubeAdvanced(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.pod = self.get_service_as_json(environment, self.pod['name'])
+        self.pod = self.get_service(environment, self.pod['name'])
 
         post_body = {
             "host": self.pod,
@@ -630,7 +630,7 @@ class TestKubeAdvanced(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.pod = self.get_service_as_json(environment, self.pod['name'])
+        self.pod = self.get_service(environment, self.pod['name'])
 
         post_body = {
             "host": self.pod,

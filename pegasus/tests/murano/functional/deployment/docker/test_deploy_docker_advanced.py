@@ -445,7 +445,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(
+        self.docker_service = self.get_service(
             environment, self.docker_service['name'])
 
         post_body = {
@@ -492,7 +492,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 3306)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(
+        self.docker_service = self.get_service(
             environment, self.docker_service['name'])
 
         post_body = {
@@ -541,7 +541,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(
+        self.docker_service = self.get_service(
             environment, self.docker_service['name'])
 
         post_body = {
@@ -611,7 +611,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 8080)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(
+        self.docker_service = self.get_service(
             environment, self.docker_service['name'])
 
         post_body = {
@@ -661,7 +661,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 4848, 8080, 8181)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(
+        self.docker_service = self.get_service(
             environment, self.docker_service['name'])
 
         post_body = {
@@ -708,7 +708,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 80)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(
+        self.docker_service = self.get_service(
             environment, self.docker_service['name'])
 
         post_body = {
@@ -756,7 +756,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 5432)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(
+        self.docker_service = self.get_service(
             environment, self.docker_service['name'])
 
         post_body = {
@@ -805,7 +805,7 @@ class MuranoDockerTestAdvanced(core.MuranoTestsCore):
         self.deployment_success_check(environment, 22, 27017)
         environment = self.get_environment(environment)
         session = self.create_session(environment)
-        self.docker_service = self.get_service_as_json(
+        self.docker_service = self.get_service(
             environment, self.docker_service['name'])
 
         post_body = {

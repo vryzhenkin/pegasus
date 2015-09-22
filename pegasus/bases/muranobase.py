@@ -132,7 +132,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         LOG.debug('Environment {0} is ready'.format(environment.name))
         return environment.manager.get(environment.id)
 
-    def check_port_access(self, ip, port):
+    def check_port_access(self, ip, port, negative=False):
         result = 1
         start_time = time.time()
         while time.time() - start_time < 600:
@@ -143,27 +143,32 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             if result == 0:
                 break
             time.sleep(5)
-        self.assertEqual(0, result, '%s port is closed on instance' % port)
+        if negative:
+            self.assertNotEqual(0, result, '%s port is opened on instance' % port)
+        else:
+            self.assertEqual(0, result, '%s port is closed on instance' % port)
 
-    def check_k8s_deployment(self, ip, port):
+    def check_k8s_deployment(self, ip, port, negative=False):
         start_time = time.time()
         while time.time() - start_time < 600:
             try:
                 LOG.debug('Checking: {0}:{1}'.format(ip, port))
-                self.verify_connection(ip, port)
+                self.verify_connection(ip, port, negative)
                 return
             except RuntimeError as e:
                 time.sleep(10)
                 LOG.debug(e)
         self.fail('Containers are not ready')
 
-    def verify_connection(self, ip, port):
+    def verify_connection(self, ip, port, negative=False):
         tn = telnetlib.Telnet(ip, port)
         tn.write('GET / HTTP/1.0\n\n')
         try:
             buf = tn.read_all()
             LOG.debug('Data:\n {0}'.format(buf))
-            if len(buf) != 0:
+            if negative and len(buf) == 0:
+                return
+            elif len(buf) != 0:
                 tn.sock.sendall(telnetlib.IAC + telnetlib.NOP)
                 return
             else:
@@ -190,7 +195,8 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         else:
             self.fail('Instance does not have floating IP')
 
-    def status_check(self, environment, configurations, kubernetes=False):
+    def status_check(self, environment, configurations, kubernetes=False,
+                     negative=False):
         """
         Function which gives opportunity to check multiple instances
         :param environment: Murano environment
@@ -210,6 +216,10 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 LOG.debug('Acquired ports: {0}'.format(ports))
                 ip = self.get_k8s_ip_by_instance_name(environment, inst_name,
                                                       service_name)
+                if ip and ports and negative:
+                    for port in ports:
+                        self.check_port_access(ip, port, negative)
+                        self.check_k8s_deployment(ip, port, negative)
                 if ip and ports:
                     for port in ports:
                         self.check_port_access(ip, port)
@@ -324,6 +334,13 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         return requests.post(endpoint, data=json.dumps(json_data),
                              headers=headers).json()
 
+    def delete_service(self, environment, session, service):
+        self.murano.services.delete(
+            environment.id, path='/{0}'.format(self.get_service_id(service)),
+            session_id=session.id)
+        updated_env = self.get_environment(environment)
+        return updated_env
+
     def deploy_environment(self, environment, session):
         self.murano.sessions.deploy(environment.id, session.id)
         return self.wait_for_environment_deploy(environment)
@@ -331,12 +348,20 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
     def get_environment(self, environment):
         return self.murano.environments.get(environment.id)
 
-    def get_service_as_json(self, environment, service_name):
+    def get_service(self, environment, service_name, to_json=True):
         for service in self.murano.services.list(environment.id):
-            if service.name == service_name:
+            if service.name == service_name and to_json:
                 service = service.to_dict()
                 service = json.dumps(service)
                 return yaml.load(service)
+            elif service.name == service_name:
+                return service
+
+    def get_service_id(self, service):
+        #TODO(freerunner): Rework this part after service object will have an id attribute
+        env_service = service.to_dict
+        s_id = env_service['?']['id']
+        return s_id
 
     def _quick_deploy(self, name, *apps):
         environment = self.murano.environments.create({'name': name})
