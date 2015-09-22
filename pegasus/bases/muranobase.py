@@ -167,6 +167,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             buf = tn.read_all()
             LOG.debug('Data:\n {0}'.format(buf))
             if negative and len(buf) == 0:
+                LOG.debug('Port negative test in action.')
                 return
             elif len(buf) != 0:
                 tn.sock.sendall(telnetlib.IAC + telnetlib.NOP)
@@ -220,7 +221,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                     for port in ports:
                         self.check_port_access(ip, port, negative)
                         self.check_k8s_deployment(ip, port, negative)
-                if ip and ports:
+                elif ip and ports:
                     for port in ports:
                         self.check_port_access(ip, port)
                         self.check_k8s_deployment(ip, port)
