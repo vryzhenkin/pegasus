@@ -47,6 +47,9 @@ case ${mode} in
     --with-html-output --html-out-file=${PEGASUS_DIR}/pegasus_results.html \
     --with-xunit --xunit-file=${PEGASUS_DIR}/pegasus_results.xml ${MURANO_TESTS_DIR}
     ;;
+    prepare)
+    message "Reay for testing!"
+    ;;
 esac
 
 RETVAL=$?
