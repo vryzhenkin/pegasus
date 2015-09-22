@@ -359,7 +359,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
 
     def get_service_id(self, service):
         #TODO(freerunner): Rework this part after service object will have an id attribute
-        env_service = service.to_dict
+        env_service = service.to_dict()
         s_id = env_service['?']['id']
         return s_id
 
