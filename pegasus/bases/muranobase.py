@@ -318,7 +318,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                                          path='/', data=data,
                                          session_id=session.id)
 
-    def create_service(self, environment, session, json_data):
+    def create_service(self, environment, session, json_data, to_json=True):
         """
         This function adding a specific service to environment
         Returns a JSON object with a service
@@ -327,13 +327,15 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         :param json_data:
         :return:
         """
-        LOG.debug('Added service:\n {0}'.format(json_data))
-        headers = self.headers.copy()
-        headers.update({'x-configuration-session': session.id})
-        endpoint = '{0}environments/{1}/services'.format(self.murano_endpoint,
-                                                         environment.id)
-        return requests.post(endpoint, data=json.dumps(json_data),
-                             headers=headers).json()
+        service = self.add_service(environment, json_data, session)
+        if to_json:
+            service = service.to_dict()
+            service = json.dumps(service)
+            LOG.debug('Create Service json: {0}'.format(yaml.load(service)))
+            return yaml.load(service)
+        else:
+            LOG.debug('Create Service: {0}'.format(service))
+            return service
 
     def delete_service(self, environment, session, service):
         LOG.debug('Removed service: {0}'.format(service.name))
