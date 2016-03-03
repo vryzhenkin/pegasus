@@ -46,7 +46,6 @@ class BasicAuth(object):
                                                  password=password,
                                                  tenant_name=tenant_name,
                                                  auth_url=uri)
-                return keystone
 
             else:
                 LOG.info('Certificate is defined. Trying to get keystone by HTTPS')
@@ -55,7 +54,7 @@ class BasicAuth(object):
                                                  tenant_name=tenant_name,
                                                  auth_url=uri,
                                                  cacert=cert_path)
-                return keystone
+            return keystone
 
         return get_keystone_client()
 

@@ -17,13 +17,12 @@ class OsClients(auth.BasicAuth):
             murano = muranoclient.Client('1', endpoint=murano_endpoint,
                                          token=keystone.auth_token,
                                          )
-            return murano
         else:
             murano = muranoclient.Client('1', endpoint=murano_endpoint,
                                          token=keystone.auth_token,
                                          cacert=cert,
                                          )
-            return murano
+        return murano
 
     @classmethod
     def get_heat_client(cls, auth_client=None):
@@ -35,9 +34,8 @@ class OsClients(auth.BasicAuth):
         if not cert:
             heat = heatclient.Client('1', endpoint=heat_endpoint,
                                      token=keystone.auth_token)
-            return heat
         else:
             heat = heatclient.Client('1', endpoint=heat_endpoint,
                                      token=keystone.auth_token,
                                      cacert=cert,)
-            return heat
+        return heat
