@@ -1,4 +1,5 @@
 import os
+import logging
 
 from keystoneclient.v2_0 import client as keystoneclient
 
@@ -6,10 +7,26 @@ from etc import config as cfg
 
 CONF = cfg.cfg.CONF
 
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
+fh = logging.FileHandler('runner.log')
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - '
+                              '%(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+LOG.addHandler(fh)
+
 
 class BasicAuth(object):
+
+    cert_path = None
+
     @staticmethod
     def _get_auth():
+
+        BasicAuth.cert_path = os.environ.get('OS_CACERT')
+        cert_path = BasicAuth.cert_path
+
         username = os.environ.get('OS_USERNAME')
         password = os.environ.get('OS_PASSWORD')
         tenant_name = os.environ.get('OS_TENANT_NAME')
@@ -22,10 +39,21 @@ class BasicAuth(object):
             uri = uri or CONF.murano.auth_url
 
         def get_keystone_client():
-            keystone = keystoneclient.Client(username=username,
-                                             password=password,
-                                             tenant_name=tenant_name,
-                                             auth_url=uri)
+
+            if not cert_path:
+                LOG. info('Certificate isn\'t defined. Trying to get keystone by HTTP')
+                keystone = keystoneclient.Client(username=username,
+                                                 password=password,
+                                                 tenant_name=tenant_name,
+                                                 auth_url=uri)
+
+            else:
+                LOG.info('Certificate is defined. Trying to get keystone by HTTPS')
+                keystone = keystoneclient.Client(username=username,
+                                                 password=password,
+                                                 tenant_name=tenant_name,
+                                                 auth_url=uri,
+                                                 cacert=cert_path)
             return keystone
 
         return get_keystone_client()
@@ -35,5 +63,6 @@ class BasicAuth(object):
         keystone = cls._get_auth()
         endpoint = \
             keystone.service_catalog.url_for(service_type=service_type,
-                                             endpoint_type=endpoint_type)
+                                             endpoint_type=endpoint_type,
+                                             )
         return endpoint
