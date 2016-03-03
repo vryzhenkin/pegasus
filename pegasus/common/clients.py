@@ -1,8 +1,6 @@
 from muranoclient import client as muranoclient
 from heatclient import client as heatclient
 
-import os
-
 import pegasus.common.auth as auth
 
 
@@ -13,8 +11,9 @@ class OsClients(auth.BasicAuth):
         keystone = auth_client if auth_client else cls._get_auth()
         murano_endpoint = cls._get_endpoint(service_type='application_catalog',
                                             endpoint_type='publicURL')
+        cert = auth.BasicAuth.cert_path
 
-        if auth.BasicAuth.http:
+        if not cert:
             murano = muranoclient.Client('1', endpoint=murano_endpoint,
                                          token=keystone.auth_token,
                                          )
@@ -22,7 +21,7 @@ class OsClients(auth.BasicAuth):
         else:
             murano = muranoclient.Client('1', endpoint=murano_endpoint,
                                          token=keystone.auth_token,
-                                         cacert=auth.BasicAuth.cert_path,
+                                         cacert=cert,
                                          )
             return murano
 
@@ -31,12 +30,14 @@ class OsClients(auth.BasicAuth):
         keystone = auth_client if auth_client else cls._get_auth()
         heat_endpoint = cls._get_endpoint(service_type='orchestration',
                                           endpoint_type='publicURL')
-        if auth.BasicAuth.http:
+        cert = auth.BasicAuth.cert_path
+
+        if not cert:
             heat = heatclient.Client('1', endpoint=heat_endpoint,
                                      token=keystone.auth_token)
             return heat
         else:
             heat = heatclient.Client('1', endpoint=heat_endpoint,
                                      token=keystone.auth_token,
-                                     cacert=auth.BasicAuth.cert_path,)
+                                     cacert=cert,)
             return heat

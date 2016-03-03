@@ -19,13 +19,14 @@ LOG.addHandler(fh)
 
 class BasicAuth(object):
 
-    http = True
-
-    #if used https download haproxy.pem
-    cert_path = os.environ.get('OS_CACERT')
+    cert_path = None
 
     @staticmethod
     def _get_auth():
+
+        BasicAuth.cert_path = os.environ.get('OS_CACERT')
+        cert_path = BasicAuth.cert_path
+
         username = os.environ.get('OS_USERNAME')
         password = os.environ.get('OS_PASSWORD')
         tenant_name = os.environ.get('OS_TENANT_NAME')
@@ -39,35 +40,21 @@ class BasicAuth(object):
 
         def get_keystone_client():
 
-            try:
+            if not cert_path:
+                LOG. info('Certificate isn\'t defined. Trying to get keystone by HTTP')
                 keystone = keystoneclient.Client(username=username,
                                                  password=password,
                                                  tenant_name=tenant_name,
                                                  auth_url=uri)
-            except Exception as e:
-                if 'Authorization Failed' in str(e):
-
-                    LOG.warning('Trying HTTPS')
-                    LOG.debug('HTTP failed exception: {0}, trying HTTPS'.format(e))
-
-                    try:
-                        keystone = keystoneclient.Client(username=username,
-                                                         password=password,
-                                                         tenant_name=tenant_name,
-                                                         auth_url=uri,
-                                                         cacert=BasicAuth.cert_path)
-                    except Exception as e:
-                        if 'Authorization Failed' in str(e):
-                            LOG.debug('Invalid URL or invalid cert for HTTPS: {0}'.format(e))
-                            exit(1)
-                    else:
-                        LOG.warning('Get keystone by HTTPS is OK')
-                        BasicAuth.HTTP = False
-                        return keystone
-                pass
+                return keystone
 
             else:
-                LOG.warning('Get keystone by HTTP is OK')
+                LOG.info('Certificate is defined. Trying to get keystone by HTTPS')
+                keystone = keystoneclient.Client(username=username,
+                                                 password=password,
+                                                 tenant_name=tenant_name,
+                                                 auth_url=uri,
+                                                 cacert=cert_path)
                 return keystone
 
         return get_keystone_client()
