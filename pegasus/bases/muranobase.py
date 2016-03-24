@@ -367,6 +367,19 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         s_id = env_service['?']['id']
         return s_id
 
+    def get_action_id(self, environment, name):
+        env_data = json.loads(self.get_environment(environment))
+        a_dict = env_data['services'][0]['?']['_actions']
+        for action_id, action in a_dict.iteritems():
+            if action['name'] == name:
+                return action_id
+            else:
+                self.fail('Service has not action {0}'.format(name))
+
+    def run_action(self, environment, action_id, arguments):
+        self.murano.actions.call(environment.id, action_id, arguments=arguments)
+        return self.wait_for_environment_deploy(environment)
+
     def _quick_deploy(self, name, *apps):
         environment = self.murano.environments.create({'name': name})
         self.environments.append(environment.id)
