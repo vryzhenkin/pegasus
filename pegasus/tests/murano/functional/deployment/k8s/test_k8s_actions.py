@@ -69,9 +69,9 @@ class TestKubeSimple(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         action_id = self.get_action_id(environment, 'scaleNodesUp')
-        arguments = {
-            "name": self.rand_name("minion-2")
-        }
+        # TODO: Need to add action properties to run_action func to define
+        # body of action arguments
+        arguments = {}
         self.run_action(environment, action_id, arguments)
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
@@ -111,9 +111,9 @@ class TestKubeSimple(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         action_id = self.get_action_id(environment, 'scaleGatewaysUp')
-        arguments = {
-            "name": self.rand_name("gateway-2")
-        }
+        # TODO: Need to add action properties to run_action func to define
+        # body of action arguments
+        arguments = {}
         self.run_action(environment, action_id, arguments)
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
