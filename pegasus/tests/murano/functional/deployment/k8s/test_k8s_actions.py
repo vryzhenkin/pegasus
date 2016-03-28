@@ -69,14 +69,18 @@ class TestKubeSimple(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         action_id = self.get_action_id(environment, 'scaleNodesUp')
-        # TODO: Need to add action properties to run_action func to define
-        # body of action arguments
-        arguments = {}
-        self.run_action(environment, action_id, arguments)
+        self.run_action(environment, action_id)
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
                            [self.cluster['name'], "minion-1", 4194],
                            [self.cluster['name'], "minion-2", 4194],
+                           [self.cluster['name'], "gateway-1", 80],
+                           ], kubernetes=True)
+        action_id = self.get_action_id(environment, 'scaleNodesDown')
+        self.run_action(environment, action_id)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
                            [self.cluster['name'], "gateway-1", 80],
                            ], kubernetes=True)
 
@@ -111,13 +115,17 @@ class TestKubeSimple(core.MuranoTestsCore):
                            ], kubernetes=True)
         environment = self.get_environment(environment)
         action_id = self.get_action_id(environment, 'scaleGatewaysUp')
-        # TODO: Need to add action properties to run_action func to define
-        # body of action arguments
-        arguments = {}
-        self.run_action(environment, action_id, arguments)
+        self.run_action(environment, action_id)
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
                            [self.cluster['name'], "minion-1", 4194],
                            [self.cluster['name'], "gateway-1", 80],
                            [self.cluster['name'], "gateway-2", 80]
+                           ], kubernetes=True)
+        action_id = self.get_action_id(environment, 'scaleGatewaysDown')
+        self.run_action(environment, action_id)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 80]
                            ], kubernetes=True)
