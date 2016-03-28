@@ -374,8 +374,8 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
             if action['name'] == name:
                 return action_id
 
-    def run_action(self, environment, action_id, arguments):
-        self.murano.actions.call(environment.id, action_id, arguments=arguments)
+    def run_action(self, environment, action_id):
+        self.murano.actions.call(environment.id, action_id)
         return self.wait_for_environment_deploy(environment)
 
     def _quick_deploy(self, name, *apps):
@@ -487,6 +487,24 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                         "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
                         "id": str(uuid.uuid4())
                     }
+                },
+                {
+                    "instance": {
+                        "name": cls.rand_name("gateway-2"),
+                        "assignFloatingIp": True,
+                        "keyname": cls.keyname,
+                        "flavor": cls.flavor,
+                        "image": cls.kubernetes,
+                        "availabilityZone": cls.availability_zone,
+                        "?": {
+                            "type": "io.murano.resources.LinuxMuranoInstance",
+                            "id": str(uuid.uuid4())
+                        }
+                    },
+                    "?": {
+                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
+                        "id": str(uuid.uuid4())
+                    }
                 }
             ],
             "?": {
@@ -520,6 +538,25 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 {
                     "instance": {
                         "name": cls.rand_name("minion-1"),
+                        "assignFloatingIp": True,
+                        "keyname": cls.keyname,
+                        "flavor": cls.flavor,
+                        "image": cls.kubernetes,
+                        "availabilityZone": cls.availability_zone,
+                        "?": {
+                            "type": "io.murano.resources.LinuxMuranoInstance",
+                            "id": str(uuid.uuid4())
+                        }
+                    },
+                    "?": {
+                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
+                        "id": str(uuid.uuid4())
+                    },
+                    "exposeCAdvisor": True
+                },
+                {
+                    "instance": {
+                        "name": cls.rand_name("minion-2"),
                         "assignFloatingIp": True,
                         "keyname": cls.keyname,
                         "flavor": cls.flavor,
