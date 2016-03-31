@@ -37,7 +37,7 @@ class TestKubeSimple(core.MuranoTestsCore):
     def tearDown(self):
         super(TestKubeSimple, self).tearDown()
 
-    def test_k8s_add_action_nodesup(self):
+    def test_k8s_action_scalenodes(self):
         post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
@@ -65,26 +65,31 @@ class TestKubeSimple(core.MuranoTestsCore):
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
                            [self.cluster['name'], "minion-1", 4194],
-                           [self.cluster['name'], "gateway-1", 80],
+                           [self.cluster['name'], "gateway-1", 80]
                            ], kubernetes=True)
         environment = self.get_environment(environment)
-        action_id = self.get_action_id(environment, 'scaleNodesUp')
+        action_id = self.get_action_id(environment, 'scaleNodesUp', 0)
         self.run_action(environment, action_id)
+        environment = self.get_environment(environment)
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
                            [self.cluster['name'], "minion-1", 4194],
                            [self.cluster['name'], "minion-2", 4194],
-                           [self.cluster['name'], "gateway-1", 80],
+                           [self.cluster['name'], "gateway-1", 80]
                            ], kubernetes=True)
-        action_id = self.get_action_id(environment, 'scaleNodesDown')
+        action_id = self.get_action_id(environment, 'scaleNodesDown', 0)
         self.run_action(environment, action_id)
+        environment = self.get_environment(environment)
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
                            [self.cluster['name'], "minion-1", 4194],
-                           [self.cluster['name'], "gateway-1", 80],
+                           [self.cluster['name'], "gateway-1", 80]
                            ], kubernetes=True)
+        self.status_check(environment,
+                          [[self.cluster['name'], "minion-2", 80]],
+                          kubernetes=True, negative=True)
 
-    def test_k8s_add_action_gatewaysup(self):
+    def test_k8s_action_scalegateways(self):
         post_body = self.get_k8s_app()
         environment = self.create_env()
         session = self.create_session(environment)
@@ -114,18 +119,64 @@ class TestKubeSimple(core.MuranoTestsCore):
                            [self.cluster['name'], "gateway-1", 80]
                            ], kubernetes=True)
         environment = self.get_environment(environment)
-        action_id = self.get_action_id(environment, 'scaleGatewaysUp')
+        action_id = self.get_action_id(environment, 'scaleGatewaysUp', 0)
         self.run_action(environment, action_id)
+        environment = self.get_environment(environment)
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
                            [self.cluster['name'], "minion-1", 4194],
                            [self.cluster['name'], "gateway-1", 80],
                            [self.cluster['name'], "gateway-2", 80]
                            ], kubernetes=True)
-        action_id = self.get_action_id(environment, 'scaleGatewaysDown')
+        action_id = self.get_action_id(environment, 'scaleGatewaysDown', 0)
         self.run_action(environment, action_id)
+        environment = self.get_environment(environment)
         self.status_check(environment,
                           [[self.cluster['name'], "master-1", 8080],
                            [self.cluster['name'], "minion-1", 4194],
                            [self.cluster['name'], "gateway-1", 80]
                            ], kubernetes=True)
+        self.status_check(environment,
+                          [[self.cluster['name'], "gateway-2", 80]],
+                          kubernetes=True, negative=True)
+
+    def test_k8s_pod_action_scalepod(self):
+        post_body = self.get_k8s_app()
+        environment = self.create_env()
+        session = self.create_session(environment)
+        self.cluster = self.create_service(environment, session, post_body)
+        replicas = 1
+        post_body = self.get_k8s_pod(self.cluster, replicas, "testkey=testvalue")
+        self.pod = self.create_service(environment, session, post_body)
+
+        post_body = {
+            "host": self.pod,
+            "image": 'redis',
+            "name": self.rand_name("Redis"),
+            "port": 6379,
+            "publish": True,
+            "?": {
+                "_{id}".format(id=uuid.uuid4().hex): {
+                    "name": "Docker Redis"
+                },
+                "type": "io.murano.apps.docker.DockerRedis",
+                "id": str(uuid.uuid4())
+            }
+        }
+        self.create_service(environment, session, post_body)
+        self.deploy_environment(environment, session)
+        self.status_check(environment,
+                          [[self.cluster['name'], "master-1", 8080],
+                           [self.cluster['name'], "minion-1", 4194],
+                           [self.cluster['name'], "gateway-1", 6379]
+                           ], kubernetes=True)
+        environment = self.get_environment(environment)
+        action_id = self.get_action_id(environment, 'scalePodUp', 1)
+        replicas += 1
+        self.run_action(environment, action_id)
+        self.check_replicas_count(environment, replicas)
+        environment = self.get_environment(environment)
+        action_id = self.get_action_id(environment, 'scalePodDown', 1)
+        replicas -= 1
+        self.run_action(environment, action_id)
+        self.check_replicas_count(environment, replicas)
