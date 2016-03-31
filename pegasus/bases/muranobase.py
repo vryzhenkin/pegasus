@@ -367,9 +367,18 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         s_id = env_service['?']['id']
         return s_id
 
-    def get_action_id(self, environment, name):
+    def get_action_id(self, environment, name, service):
+        """
+        Kubernets Cluster data is the first element and
+        Kubernets Pod data is the second element in services' list
+        :param environment:
+        :param name:
+        :param service: for KubernetsCluster value is 0
+                        for KubernetsPod value is 1
+        :return:
+        """
         env_data = environment.to_dict()
-        a_dict = env_data['services'][0]['?']['_actions']
+        a_dict = env_data['services'][service]['?']['_actions']
         for action_id, action in a_dict.iteritems():
             if action['name'] == name:
                 return action_id
@@ -377,6 +386,12 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
     def run_action(self, environment, action_id):
         self.murano.actions.call(environment.id, action_id)
         return self.wait_for_environment_deploy(environment)
+
+    def check_replicas_count(self, environment, expected_count):
+        env = self.get_environment(environment)
+        env_data = env.to_dict()
+        observed_count = env_data['services'][1]['replicas']
+        self.assertEqual(expected_count, int(observed_count), message='ScalePod action does not work')
 
     def _quick_deploy(self, name, *apps):
         environment = self.murano.environments.create({'name': name})
