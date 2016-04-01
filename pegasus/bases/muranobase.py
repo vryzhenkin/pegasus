@@ -67,7 +67,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         self.keystone = self._get_auth()
         self.heat = self.get_heat_client(self.keystone)
         self.murano = self.get_murano_client(self.keystone)
-        self.headers = {'X-Auth-Token': self.keystone.auth_token,
+        self.headers = {'X-Auth-Token': self.http_client.auth_token,
                         'content-type': 'application/json'}
 
         self.environments = []
