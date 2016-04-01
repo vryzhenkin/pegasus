@@ -51,7 +51,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         super(MuranoTestsCore, cls).setUpClass()
 
         cfg.load_config()
-        cls.murano_url = cls._get_endpoint(service_type='application_catalog',
+        cls.murano_url = cls._get_endpoint(service_type='application-catalog',
                                             endpoint_type='publicURL')
         cls.murano_endpoint = cls.murano_url + '/v1/'
         cls.keyname = CONF.murano.keyname
@@ -67,7 +67,7 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         self.keystone = self._get_auth()
         self.heat = self.get_heat_client(self.keystone)
         self.murano = self.get_murano_client(self.keystone)
-        self.headers = {'X-Auth-Token': self.murano.auth_token,
+        self.headers = {'X-Auth-Token': self.keystone.auth_token,
                         'content-type': 'application/json'}
 
         self.environments = []
