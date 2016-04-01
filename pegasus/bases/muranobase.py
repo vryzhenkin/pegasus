@@ -367,6 +367,32 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
         s_id = env_service['?']['id']
         return s_id
 
+    def get_action_id(self, environment, name, service):
+        """
+        Kubernets Cluster data is the first element and
+        Kubernets Pod data is the second element in services' list
+        :param environment:
+        :param name:
+        :param service: for KubernetsCluster value is 0
+                        for KubernetsPod value is 1
+        :return:
+        """
+        env_data = environment.to_dict()
+        a_dict = env_data['services'][service]['?']['_actions']
+        for action_id, action in a_dict.iteritems():
+            if action['name'] == name:
+                return action_id
+
+    def run_action(self, environment, action_id):
+        self.murano.actions.call(environment.id, action_id)
+        return self.wait_for_environment_deploy(environment)
+
+    def check_replicas_count(self, environment, expected_count):
+        env = self.get_environment(environment)
+        env_data = env.to_dict()
+        observed_count = env_data['services'][1]['replicas']
+        self.assertEqual(expected_count, int(observed_count), message='ScalePod action does not work')
+
     def _quick_deploy(self, name, *apps):
         environment = self.murano.environments.create({'name': name})
         self.environments.append(environment.id)
@@ -476,6 +502,24 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                         "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
                         "id": str(uuid.uuid4())
                     }
+                },
+                {
+                    "instance": {
+                        "name": cls.rand_name("gateway-2"),
+                        "assignFloatingIp": True,
+                        "keyname": cls.keyname,
+                        "flavor": cls.flavor,
+                        "image": cls.kubernetes,
+                        "availabilityZone": cls.availability_zone,
+                        "?": {
+                            "type": "io.murano.resources.LinuxMuranoInstance",
+                            "id": str(uuid.uuid4())
+                        }
+                    },
+                    "?": {
+                        "type": "io.murano.apps.docker.kubernetes.KubernetesGatewayNode",
+                        "id": str(uuid.uuid4())
+                    }
                 }
             ],
             "?": {
@@ -509,6 +553,25 @@ class MuranoTestsCore(testtools.TestCase, testtools.testcase.WithAttributes,
                 {
                     "instance": {
                         "name": cls.rand_name("minion-1"),
+                        "assignFloatingIp": True,
+                        "keyname": cls.keyname,
+                        "flavor": cls.flavor,
+                        "image": cls.kubernetes,
+                        "availabilityZone": cls.availability_zone,
+                        "?": {
+                            "type": "io.murano.resources.LinuxMuranoInstance",
+                            "id": str(uuid.uuid4())
+                        }
+                    },
+                    "?": {
+                        "type": "io.murano.apps.docker.kubernetes.KubernetesMinionNode",
+                        "id": str(uuid.uuid4())
+                    },
+                    "exposeCAdvisor": True
+                },
+                {
+                    "instance": {
+                        "name": cls.rand_name("minion-2"),
                         "assignFloatingIp": True,
                         "keyname": cls.keyname,
                         "flavor": cls.flavor,
