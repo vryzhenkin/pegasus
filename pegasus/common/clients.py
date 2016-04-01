@@ -9,7 +9,7 @@ class OsClients(auth.BasicAuth):
     @classmethod
     def get_murano_client(cls, auth_client=None):
         keystone = auth_client if auth_client else cls._get_auth()
-        murano_endpoint = cls._get_endpoint(service_type='application_catalog',
+        murano_endpoint = cls._get_endpoint(service_type='application-catalog',
                                             endpoint_type='publicURL')
         cert = auth.BasicAuth.cert_path
 
