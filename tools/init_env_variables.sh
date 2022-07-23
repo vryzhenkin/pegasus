@@ -14,3 +14,5 @@ message() {
 error() {
     printf "\e[31mError: %s\e[0m\n" "${*}" >&2
 }
+
+#test
