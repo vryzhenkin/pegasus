@@ -40,3 +40,5 @@ If you have one controller, you need to be sure, that your Heat component works 
 
 Remember, slow speed of internet connection at your environment can dramatically increase time for creating/updating Heat stack.
 In this case tests usually fails by timeout.
+
+Test
